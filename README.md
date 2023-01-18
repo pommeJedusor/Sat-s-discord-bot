@@ -6,6 +6,7 @@
 
 au moment du tirage si pity non complète le bot additionne les indices de drop et tire au sort un nombre au hasard et renvoy l'objet correspondant exemple: pomme: 1 , poire: 2 , patate: 5 le bot fait la somme 1+2+5=8 tire au sort un nombre entier entre 1 et 8 compris puis si 1 donne pomme, si 2 ou 3 donne poire et de 4 à 8 donne patate (si la somme total est de cent cela équivaut à un pourcentage et si de milles ou dix milles cela l'inclut avec les virgules. exemple: pomme: 40, poire: 10 patate: 50. la pomme auras 40% de chance d'être tirés)
 
+pour la question de la semaine, vous pouvez mettre au début la commande "!question x_y", x étant égal au nombre de gemmes que recevront les joueurs répondant à la question(si répondent plusieur fois ne donne qu'une fois les gemmes) et y étant égal au nombre d'heures pendant lequelles les joueur répondant pourront obtenir la récompense(si nouvelle question l'ancienne question ne donneras quoi qu'il arrive plus de récompense)
 
 |commandes|pour les modos|
 |---------|--------------|
