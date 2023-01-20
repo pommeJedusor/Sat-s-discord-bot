@@ -24,6 +24,7 @@ pour la question de la semaine, vous pouvez mettre au début la commande "!quest
 |reset_power|permet de réactiver les pouvoirs Yato, panda et arsmote des joueurs|
 |see_effects_of_a_player|permet de voir les effets d'un joueur|
 |see_pity_of_a_player|permet de voir la pity d'un joueur|
+|question|à utiliser juste avant de poser la question de la semain récompenserat tous les joueurs répondant du nombre de gemmes(si répondent plusieurs fois ne marche que la première)|
 
 |commandes|pour les joueurs|
 |---------|----------------|
@@ -37,3 +38,19 @@ pour la question de la semaine, vous pouvez mettre au début la commande "!quest
 |panda|réduit de 10% la pity pas réutilisable jusqu'à ce que les modos le réactive, nécéssite l'item panda|
 |arsmote|permet de relancer le tirage d'un item 4 étoiles obtenu lors du dernier tirage(peut réobtenir le même si pas de chance)|
 |yato|nécéssite Yato, pour les 10 prochains tirages 20% de chance de gagner 2 gemmes à la place|
+
+## pour les tirages
+
+#### 1ère méthode (plus pratique)
+utiliser la commande "/question",  
+indiquer le nombre de gemmes que récupèreront les joueurs répondant à la question,  
+vous recevrez un message de validation du bot,  
+posez la question  
+(! attention tout faire dans le channel question de la semaine, sinon ne feras rien)
+
+#### 2ème méthode (si bot hors ligne)
+mettre au début de la question "!question x", x étant le nombre de gemmes que récupèreront les joueurs répondant à la question, (ne pas mettre les guillemets évidamment),  
+finir d'écrire la question, l'envoyer et c'est bon
+
+quand le bot va se reconnecter il va checker les derniers messages du channel, et s'actualiser avec cette méthode même si il est hors ligne 2 mois ça marcheras(en théorie car il ne regarde que les 50 derniers messages, et il ne seras pas hors ligne 2 mois normalement),  
+en revanche comme la commande est dans le message les joueurs pourront le voir ainsi que le nombre de gemmes, ce qui n'est pas très ésthétique
