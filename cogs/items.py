@@ -90,8 +90,6 @@ class Items(commands.Cog):
                 for ligne in lignes:
                     if ligne[1]==i:
                         items_tried.append(ligne)
-            for item in items_tried:
-                print(item)
         elif tri and tri.value=="name":
             items_tried = sorted(lignes)
         lignes = items_tried
