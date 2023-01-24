@@ -79,5 +79,24 @@ class Tirage(commands.Cog):
         else:
             await interaction.response.send_message("vous n'avez pas le bon role")
 
+    @app_commands.command(name="edit_pity_of_a_player",description="permet de modifier la pity d'un joueur")
+    async def see_pity_of_a_player(self,interaction:discord.Interaction,user:discord.Member,dénominateur_4:int=False,dénominateur_5:int=False,numérateur_4:int=False,numérateur_5:int=False):
+        if global_functions.bon_role(interaction.user):
+            player = global_functions.Player(user.name,user.id)
+            player.is_player()
+            if not numérateur_5:
+                numérateur_5=player.caracter[6][1]
+            if not numérateur_4:
+                numérateur_4=player.caracter[6][0]
+            if not dénominateur_4:
+                dénominateur_4=player.caracter[6][2]
+            if not dénominateur_5:
+                dénominateur_5=player.caracter[6][3]
+            player.caracter[6] = [numérateur_4,numérateur_5,dénominateur_4,dénominateur_5]
+            player.update_stats_player_fichier()
+            await interaction.response.send_message(f"le joueur {user.name} a désormais comme pity: \npour 4 étoiles: {player.caracter[6][0]}/{player .caracter[6][2]} \net pour 5 étoiles {player.caracter[6][1]}/{player .caracter[6][3]} ")
+        else:
+             await interaction.response.send_message("vous n'avez pas le bon role")   
+
 async def setup(bot):
     await bot.add_cog(Tirage(bot))
