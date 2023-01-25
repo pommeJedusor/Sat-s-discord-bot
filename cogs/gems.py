@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 import global_functions
+from datas.datas import Datas
 
 class Gems(commands.Cog):
     def __init__(self,bot):
@@ -27,7 +28,7 @@ class Gems(commands.Cog):
         if global_functions.bon_role(interaction.user):
             player = global_functions.Player(user.name,user.id)
             player.is_player()
-            await interaction.response.send_message(f"{user.name} possede {player.caracter[2]} gemmes \n et a dépensé un total de {player.caracter[3]} gemmes ")
+            await interaction.response.send_message(f"{Datas.emogi_cristal} **{user.name}** possède **{player.caracter[2]} Cristaux d'Expédition ** ! {Datas.emogi_cristal}\n{Datas.emogi_cristal} a dépensé au total **{player.caracter[3]} Cristaux d'Expédition **! {Datas.emogi_cristal}")
         else:
             await interaction.response.send_message(f"vous n'avez pas le bon rôle")
 
@@ -53,7 +54,7 @@ class Gems(commands.Cog):
     async def see_gems(self,interaction : discord.Interaction):
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
-        await interaction.response.send_message(f"vous possédez {player.caracter[2]} gemmes \n vous avez dépensez un total de {player.caracter[3]} gemmes ")
+        await interaction.response.send_message(f"{Datas.emogi_cristal} Vous possédez **{player.caracter[2]} Cristaux d'Expédition** ! {Datas.emogi_cristal}\n{Datas.emogi_cristal} Vous avez dépensez au total **{player.caracter[3]} Cristaux d'Expédition** ! {Datas.emogi_cristal}")
 
 
 async def setup(bot):

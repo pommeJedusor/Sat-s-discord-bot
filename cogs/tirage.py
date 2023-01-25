@@ -3,6 +3,8 @@ from discord import app_commands
 from discord.ext import commands
 
 import global_functions
+from datas.datas import Datas
+
 
 import random, asyncio
 
@@ -60,7 +62,7 @@ class Tirage(commands.Cog):
         if global_functions.bon_role(interaction.user):
             player.caracter[5]=interaction.channel_id
             player.update_stats_player_fichier()
-            await interaction.response.send_message(f"le nouveau channel perso de {user} est désormais {interaction.channel.name} ")
+            await interaction.response.send_message(f"{Datas.emogi_cristal}** Le Salon perso de __{user}__ est désormais __{interaction.channel.name}__. ** {Datas.emogi_cristal}")
         else:
             await interaction.response.send_message("vous n'avez pas le bon role")
 
@@ -68,7 +70,7 @@ class Tirage(commands.Cog):
     async def voir_sa_pity(self,interaction:discord.Interaction):
         player=global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
-        await interaction.response.send_message(f"pour l'obtention d'une 4 étoiles: {player.caracter[6][0]}/{player.caracter[6][2]} \n pour l'obtention d'une 5 étoiles: {player.caracter[6][1]}/{player.caracter[6][3]}")
+        await interaction.response.send_message(f"**Votre pity :star::star::star::star: : {player.caracter[6][0]}/{player.caracter[6][2]} **\n**Votre pity :star::star::star::star::star: : {player.caracter[6][1]}/{player.caracter[6][3]} **")
 
     @app_commands.command(name="see_pity_of_a_player",description="permet de voir la pity d'un joueur")
     async def see_pity_of_a_player(self,interaction:discord.Interaction,user:discord.Member):

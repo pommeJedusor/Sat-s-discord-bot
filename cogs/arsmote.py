@@ -74,8 +74,10 @@ class Arsmote(commands.Cog):
                 await interaction.response.send_message("arsmote",view=view,ephemeral=True)
             else:
                 await interaction.response.send_message(f"vous n'avez pas eu de 4 étoiles lors de votre dernier tirage",ephemeral=True)
-        else:
+        elif {"id":Datas.arsmote_id,"active":False} in player.caracter[8]:
             await interaction.response.send_message(f"vous n'avez pas le pouvoir d'actif",ephemeral=True)
+        else:
+            await interaction.response.send_message(f":x: **Vous n'avez pas l'objet requis pour effectuer cette commande.** :x:")
 
 async def setup(bot):
     await bot.add_cog(Arsmote(bot))

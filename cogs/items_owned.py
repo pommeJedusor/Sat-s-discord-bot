@@ -17,7 +17,7 @@ class ItemsOwned(commands.Cog):
             item=global_functions.Items(name)
             if item.is_item() and nombre>0:
                 player.add_item([{"id":item.caracter[6],"nb":nombre}])
-                await interaction.response.send_message(f"l'item {name} a bien été ajouté à {user.name} en quantité de {nombre} ")
+                await interaction.response.send_message(f":gift: **L'objet __{name}__ (x{nombre}) a bien été ajouté à {user.name}** :gift:")
             elif not item.is_item():
                 await interaction.response.send_message(f"{name} n'as pas été trouvé")
             else:
@@ -100,7 +100,7 @@ class ItemsOwned(commands.Cog):
         if text !="":
             await interaction.response.send_message(text)
         else:
-            await interaction.response.send_message(f"vous n'avez aucun effet")
+            await interaction.response.send_message(f":x: **Vous n'avez aucun effet.** :x:")
 
     @app_commands.command(name="see_effects_of_a_player",description="permet de voir les effets d'un joueur")
     async def see_effects_of_a_player(self,interaction: discord.Interaction, user:discord.Member):
