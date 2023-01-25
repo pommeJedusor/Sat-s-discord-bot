@@ -36,11 +36,11 @@ class Powers(commands.Cog):
             for power in player.caracter[8]:
                     if power['id']==Datas.Yato_id:
                         power['active']=False
-            print("activé")
-        elif  not {"id":Datas.Yato_id,"active":True} in player.caracter[8]:
-            print("pouvoir désactivé")
+            await interaction.response.send_message("activé")
+        elif  player.caracter[10]>0:
+            await interaction.response.send_message(f"il vous reste {player.caracter[10]} tirages où le pouvoir peut prendre effets")
         else:
-            print("le pouvoir est encore actif")
+            await interaction.response.send_message("pouvoir désactivé")
         player.update_stats_player_fichier()
     
     @app_commands.command(name="panda",description=r"utilise la capacité de panda et réduit de 10% la pity a avoir")
