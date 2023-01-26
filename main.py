@@ -4,6 +4,7 @@ from datas.datas import Datas
 
 import global_functions
 
+cogs = ["gems","items_owned","items","powers","tirage","arsmote","question","help"]
 
 intents = discord.Intents.all()
 bot=commands.Bot(command_prefix="!", intents=intents)
@@ -11,14 +12,8 @@ bot=commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     try:
-        await bot.load_extension("cogs.gems")
-        await bot.load_extension("cogs.items_owned")
-        await bot.load_extension("cogs.items")
-        await bot.load_extension("cogs.powers")
-        await bot.load_extension("cogs.tirage")
-        await bot.load_extension("cogs.arsmote")
-        await bot.load_extension("cogs.question")
-        await bot.load_extension("cogs.help")
+        for cog in cogs:
+            await bot.load_extension(f"cogs.{cog}")
         synced = await bot.tree.sync()
         print(f"synced {len(synced) }command(s)")
     except Exception as e:
@@ -41,6 +36,15 @@ async def on_ready():
             global_functions.votes(user,poire)
     print("prêt")
 
+@bot.tree.command(name="reload_cogs")
+async def reload_cogs(interaction:discord.Interaction):
+    await interaction.response.defer()
+    for cog in cogs:
+        await bot.unload_extension(f"cogs.{cog}")
+    for cog in cogs:
+        await bot.load_extension(f"cogs.{cog}")
+    synced = await bot.tree.sync()
+    await interaction.edit_original_response(content=f"{len(synced)} synchronisé")
 
 
 @bot.event
