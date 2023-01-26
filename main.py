@@ -18,7 +18,7 @@ async def on_ready():
         await bot.load_extension("cogs.tirage")
         await bot.load_extension("cogs.arsmote")
         await bot.load_extension("cogs.question")
-        #await bot.load_extension("cogs.help")
+        await bot.load_extension("cogs.help")
         synced = await bot.tree.sync()
         print(f"synced {len(synced) }command(s)")
     except Exception as e:
