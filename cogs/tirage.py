@@ -5,8 +5,9 @@ from discord.ext import commands
 import global_functions
 from datas.datas import Datas
 
-
 import random, asyncio
+
+tirage_en_cours = False
 
 class Tirage(commands.Cog):
     def __init__(self,bot):
@@ -14,10 +15,12 @@ class Tirage(commands.Cog):
 
     @app_commands.command(name="tirage",description="permet de faire des tirages")
     async def tirages(self,interaction:discord.Interaction,nombre_de_tirage:int):
+        global tirage_en_cours
         player = global_functions.Player(interaction.user.id,interaction.user.id)
         player.is_player()
         channel_perso=self.bot.get_channel(player.caracter[5])
-        if player.caracter[2]>=nombre_de_tirage and nombre_de_tirage<=10 and interaction.channel_id==Datas.channel_tirage_gacha:
+        if player.caracter[2]>=nombre_de_tirage and nombre_de_tirage<=10 and interaction.channel_id==Datas.channel_tirage_gacha and not tirage_en_cours:
+            tirage_en_cours = True
             await interaction.response.send_message(f"vous avez obtenus...")
 
             #yato
@@ -55,12 +58,15 @@ class Tirage(commands.Cog):
                         await channel_perso.send(f"{i.caracter[3]}")
                     if not interaction.channel==channel_perso:
                         await interaction.channel.send(f"{i.caracter[3]}")
+            tirage_en_cours = False
         elif not interaction.channel_id==Datas.channel_tirage_gacha:
             await interaction.response.send_message(f"vous êtes dans le mauvais channel aller dans tirage gacha pour effectuer cette commande",ephemeral=True)
         elif nombre_de_tirage>10:
-            await interaction.response.send_message("vous ne pouvez éffectuer qu'un maximum de 10 tirages à la fois")
+            await interaction.response.send_message("vous ne pouvez éffectuer qu'un maximum de 10 tirages à la fois",ephemeral=True)
+        elif tirage_en_cours:
+            await interaction.response.send_message(f"un tirage est déja en cours veuillez patienter et retenter plus tard",ephemeral=True)
         else:
-            await interaction.response.send_message(f"il vous manque {nombre_de_tirage-player.caracter[2]} gemmes")
+            await interaction.response.send_message(f"il vous manque {nombre_de_tirage-player.caracter[2]} gemmes",ephemeral=True)
 
     @app_commands.command(name="change_channel",description="permet de changer ou d'initialiser le channel d'un joueur")
     async def change_channel(self,interaction:discord.Interaction,user:discord.Member):
