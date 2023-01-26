@@ -96,7 +96,7 @@ class Player:
             return False
     def spend_gems(self,nb):
         """dépense les gemmes d'un joueur"""
-        if self.caracter[2]>nb>0:
+        if self.caracter[2]>=nb>0:
             self.caracter[2]-=nb
             self.caracter[3]+=nb
             self.update_stats_player_fichier

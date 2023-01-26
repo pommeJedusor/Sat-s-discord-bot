@@ -19,24 +19,29 @@ class Tirage(commands.Cog):
         channel_perso=self.bot.get_channel(player.caracter[5])
         if player.caracter[2]>=nombre_de_tirage and nombre_de_tirage<=10:
             await interaction.response.send_message(f"vous avez obtenus...")
-            if nombre_de_tirage>player.caracter[10]:
-                nombre_de_tentative_gemmes=player.caracter[10]
-            else:
-                nombre_de_tentative_gemmes=nombre_de_tirage
-            compteur_de_gemmes=0
-            for i in range(nombre_de_tentative_gemmes):
-                if random.randint(1,5)==4:
-                    compteur_de_gemmes+=1
-                    nombre_de_tirage-=1
-                    player.caracter[2]+=1
-                    player.caracter[3]+=1
-                player.caracter[10]-=1
-            player.update_stats_player_fichier()
-            for i in range(compteur_de_gemmes):
-                await channel_perso.send("vous avez gagné 2 gemmes")
-                if not interaction.channel==channel_perso:
-                    await interaction.channel.send("vous avez gagné 2 gemmes")
-                await asyncio.sleep(2)
+
+            #yato
+            if player.caracter[10]>0:
+                if nombre_de_tirage>player.caracter[10]:
+                    nombre_de_tentative_gemmes=player.caracter[10]
+                else:
+                    nombre_de_tentative_gemmes=nombre_de_tirage
+                compteur_de_gemmes=0
+                for i in range(nombre_de_tentative_gemmes):
+                    if random.randint(1,5)==4:
+                        compteur_de_gemmes+=1
+                        nombre_de_tirage-=1
+                        player.caracter[2]+=1
+                        player.caracter[3]+=1
+                    player.caracter[10]-=1
+                player.update_stats_player_fichier()
+                for i in range(compteur_de_gemmes):
+                    await channel_perso.send("vous avez gagné 2 gemmes")
+                    if not interaction.channel==channel_perso:
+                        await interaction.channel.send("vous avez gagné 2 gemmes")
+                    await asyncio.sleep(2)
+
+            
             player.update_stats_player_fichier()
             for i in player.tirages(nombre_de_tirage):
                 i.is_item()
