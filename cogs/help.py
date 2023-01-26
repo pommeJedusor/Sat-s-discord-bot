@@ -8,10 +8,10 @@ from datas.datas import Datas
 
 class SuggestModal(discord.ui.Modal, title="suggestion"):
     global channel_bot
-    suggestion = discord.ui.TextInput(label="pomme",style=discord.TextStyle.paragraph)
+    suggestion = discord.ui.TextInput(label="suggestion",style=discord.TextStyle.paragraph)
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.send_message(f"suggestion envoyé",ephemeral=True)
-        await channel_bot.send(f"{self.suggestion}")
+        await channel_bot.send(f"{interaction.user.name}: {self.suggestion}")
 
 class Buttons(discord.ui.View):
     def __init__(self):
