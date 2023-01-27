@@ -168,37 +168,50 @@ class Player:
         all_items=[]
         for i in range(nb_tirage):
             result=None
-            if tirage_4==False:
-                if self.caracter[6][1]+1>=self.caracter[6][3]:
-                    result =tirage(files,5)
-                elif self.caracter[6][0]+1>=self.caracter[6][2]:
-                    result = tirage(files,4)
-                else:
-                    result = tirage(files)
-                if result and result['stars'] == 5:
-                    self.caracter[6][1]=0
-                    self.caracter[6][3]=50
-                    self.caracter[6][0]+=1
-                    self.spend_gems(1)
-                elif result and result['stars'] == 4:
-                    self.caracter[6][0]=0
-                    self.caracter[6][2]=10
-                    self.caracter[6][1]+=1
-                    self.spend_gems(1)
-                elif result:
-                    self.caracter[6][0]+=1
-                    self.caracter[6][1]+=1
-                    self.spend_gems(1)
+            aléa = random.randint(1,5)
+            print(aléa)
+            if self.caracter[10]>0 and aléa==4:
+                result = "2 cristaux d'expeditions"
+                self.caracter[2]+=2
+                self.update_stats_player_fichier()
+                self.spend_gems(1)
+                all_items.append(result)
             else:
-                result= tirage(files,4)
-            if result:
-                new_item=Items(result['name'])
-                new_item.is_item()
-                self.add_item([{"id":new_item.caracter[6],"nb":1}])
-                all_items.append(new_item)
+                if tirage_4==False:
+                    if self.caracter[6][1]+1>=self.caracter[6][3]:
+                        result =tirage(files,5)
+                    elif self.caracter[6][0]+1>=self.caracter[6][2]:
+                        result = tirage(files,4)
+                    else:
+                        result = tirage(files)
+                    if result and result['stars'] == 5:
+                        self.caracter[6][1]=0
+                        self.caracter[6][3]=50
+                        self.caracter[6][0]+=1
+                        self.spend_gems(1)
+                    elif result and result['stars'] == 4:
+                        self.caracter[6][0]=0
+                        self.caracter[6][2]=10
+                        self.caracter[6][1]+=1
+                        self.spend_gems(1)
+                    elif result:
+                        self.caracter[6][0]+=1
+                        self.caracter[6][1]+=1
+                        self.spend_gems(1)
+                else:
+                    result= tirage(files,4)
+                if result:
+                    new_item=Items(result['name'])
+                    new_item.is_item()
+                    self.add_item([{"id":new_item.caracter[6],"nb":1}])
+                    all_items.append(new_item)
+            #réduit de 1 la variable yato
+            if self.caracter[10]>0:
+                self.caracter[10]-=1
         self.caracter[9]=[]
         for item in all_items:
-            self.caracter[9].append(item.caracter[6])
+            if not item=="2 cristaux d'expeditions":
+                self.caracter[9].append(item.caracter[6])
         self.update_stats_player_fichier()
         return all_items
 class Items:
