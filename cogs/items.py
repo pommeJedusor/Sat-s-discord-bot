@@ -84,23 +84,24 @@ class Items(commands.Cog):
         lignes = list(filter(stars_filter,lignes))
         lignes = list(filter(drop_filter,lignes))
         items_tried = lignes
-        if tri and tri.value=="stars":
+        if (tri and tri.value=="stars") or tri==None:
             items_tried = []
             for i in range(1,6):
                 for ligne in lignes:
                     if ligne[1]==i:
                         items_tried.append(ligne)
-        elif tri and tri.value=="name":
+        if tri and tri.value=="name":
             items_tried = sorted(lignes)
         lignes = items_tried
 
         for ligne in lignes:
+            stars = "".join([":star:" for i in range(ligne[1])])
             if ligne[5]:
-                items.append(f"nom: {ligne[0]}, {ligne[1]} étoiles, drop:{ligne[2]}, effets:{ligne[4]}, est présent dans les tirages \n")
+                items.append(f"{stars} - **__{ligne[0]}__**  - Taux : {ligne[2]}  - Présent\n")
             else:
-                items.append(f"nom: {ligne[0]}, {ligne[1]} étoiles, drop:{ligne[2]}, effets:{ligne[4]}, est absent des tirages \n")
-
-        await interaction.response.send_message("".join(items[:10]))
+                items.append(f"{stars} - **__{ligne[0]}__**  - Taux : {ligne[2]}  - Absent\n")
+        await interaction.response.send_message(f"**  {Datas.emogi_cristal}  Liste des objets:{Datas.emogi_cristal}**\n\n__**Objets :**__")
+        await interaction.channel.send("".join(items[:10]))
         for i in range(1,(len(items)-1)//10+1):
             await interaction.channel.send("".join(items[10*i:10*i+10]))
 

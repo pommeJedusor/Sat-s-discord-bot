@@ -61,10 +61,18 @@ class ItemsOwned(commands.Cog):
         if player.caracter[4]:
             text+=f"**   {Datas.emogi_cristal} Ton inventaire : {Datas.emogi_cristal}**\n\n"
             text+=f"__**Objets :**__\n"
-        for item in player.caracter[4]:
+        items_tried = []
+        for i in range(1,6):
+            for item in player.caracter[4]:
+                iteme=global_functions.Items("pomme",id=item['id'])
+                iteme.is_item(x=6)
+                if iteme.caracter[1]==i:
+                    items_tried.append(item)
+        for item in items_tried:
             iteme=global_functions.Items("pomme",id=item['id'])
             iteme.is_item(x=6)
-            text+=f"**{iteme.caracter[0]} (x{item['nb']}) **\n"
+            stars = "".join([":star:" for i in range(iteme.caracter[1])])
+            text+=f"{stars} - **{iteme.caracter[0]} (x{item['nb']}) **\n"
         if not text:
             text="malheureusement vous ne possédez aucun item, n'hésitez pas à faire des tirages pour en avoir "
         await interaction.response.send_message(text)
@@ -75,10 +83,18 @@ class ItemsOwned(commands.Cog):
             player = global_functions.Player(user.name,user.id)
             player.is_player()
             text=""
-            for item in player.caracter[4]:
+            items_tried = []
+            for i in range(1,6):
+                for item in player.caracter[4]:
+                    iteme=global_functions.Items("pomme",id=item['id'])
+                    iteme.is_item(x=6)
+                    if iteme.caracter[1]==i:
+                        items_tried.append(item)
+            for item in items_tried:
                 iteme=global_functions.Items("pomme",id=item['id'])
                 iteme.is_item(x=6)
-                text+=f"{iteme.caracter[0]}: nombre:{item['nb']} \n"
+                stars = "".join([":star:" for i in range(iteme.caracter[1])])
+                text+=f"{stars} - **{iteme.caracter[0]} (x{item['nb']}) **\n"
             if text:
                 await interaction.response.send_message(text)
             else:
