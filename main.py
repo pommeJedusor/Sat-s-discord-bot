@@ -70,6 +70,13 @@ async def on_message(message):
                 line=json.loads(ligne)
             else:
                 line = {"nb_gemmes": 0, "id_users": [], "starttime": 0, "message_id": 0}
+
+        #débugg
+        print(datetime.datetime.timestamp(message.created_at), line["starttime"])
+        print(message.content.find("!question"))
+        print(line["id_users"])
+        print(message.author.id in line['id_users'])
+
         
         if datetime.datetime.timestamp(message.created_at)>line["starttime"] and line["id_users"]==False and line["message_id"]==message.author.id:
             args={"nb_gemmes":line["nb_gemmes"],"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
@@ -83,7 +90,6 @@ async def on_message(message):
             args={"nb_gemmes":args[1],"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
             with open(Datas.question_file,'w') as f:
                 f.write(json.dumps(args))
-
         elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("!question")==-1 and not line["id_users"]==False and not message.author.id in line['id_users']: 
             #si un joueur réponds à la question
             player=global_functions.Player(message.author.name,message.author.id)
