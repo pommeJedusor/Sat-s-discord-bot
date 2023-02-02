@@ -22,14 +22,14 @@ async def on_ready():
     bot_channel = bot.get_channel(Datas.channel_message_bot)
     #check si y a des réponse à la question de la semaine et donne les gemmes correspondante si c'est le cas
     channel_question=bot.get_channel(Datas.channel_question)
+    with open(Datas.question_file, "r") as f:
+        line = f.readline()
+        line=json.loads(line)
     async for message in channel_question.history(oldest_first=False):
-        if message.id == 1070646723082457128:
+        if message.id == line["message_id"]:
             last_question=message
             break
-
     async for message in channel_question.history(after=last_question,oldest_first=True):
-        print(message.content)
-        print(message.author)
         await on_message(message)
 
     #check si y a des nouveaux votes
@@ -74,13 +74,6 @@ async def on_message(message):
                 line=json.loads(ligne)
             else:
                 line = {"nb_gemmes": 0, "id_users": [], "starttime": 0, "message_id": 0}
-
-        #débugg
-        '''print(datetime.datetime.timestamp(message.created_at) > line["starttime"])
-        print(message.content.find("!question"))
-        print(line["id_users"])
-        print(message.author.id)
-        print(not message.author.id in line['id_users'])'''
 
 
         if datetime.datetime.timestamp(message.created_at)>line["starttime"] and line["id_users"]==False and line["message_id"]==message.author.id:
