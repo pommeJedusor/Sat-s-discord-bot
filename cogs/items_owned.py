@@ -75,7 +75,7 @@ class ItemsOwned(commands.Cog):
             text+=f"{stars} - **{iteme.caracter[0]} (x{item['nb']}) **\n"
         if not text:
             text="malheureusement vous ne possédez aucun item, n'hésitez pas à faire des tirages pour en avoir "
-        await interaction.response.send_message(text)
+        await interaction.response.send_message(text,ephemeral=True)
 
     @app_commands.command(name="see_items_of_a_player",description="permet à un modo de voir les items d'un joueur")
     async def see_items_of_a_player(self,interaction:discord.Interaction, user:discord.Member):
