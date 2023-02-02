@@ -54,7 +54,7 @@ class Gems(commands.Cog):
     async def see_gems(self,interaction : discord.Interaction):
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
-        await interaction.response.send_message(f"{Datas.emogi_cristal} Vous possédez **{player.caracter[2]} Cristaux d'Expédition** ! {Datas.emogi_cristal}\n{Datas.emogi_cristal} Vous avez dépensez au total **{player.caracter[3]} Cristaux d'Expédition** ! {Datas.emogi_cristal}")
+        await interaction.response.send_message(f"{Datas.emogi_cristal} Vous possédez **{player.caracter[2]} Cristaux d'Expédition** ! {Datas.emogi_cristal}\n{Datas.emogi_cristal} Vous avez dépensez au total **{player.caracter[3]} Cristaux d'Expédition** ! {Datas.emogi_cristal}",ephemeral=True)
 
 
 async def setup(bot):
