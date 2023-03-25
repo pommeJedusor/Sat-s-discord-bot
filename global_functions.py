@@ -8,8 +8,10 @@ def tirage(file,stars=None):
         pomme=0
         for line in f:
             line=json.loads(line)
-            if not stars or line[1]==stars:
-                if line[2]!=0 and line[5]==True:
+            #si pas de nombre d'étoiles précise ou correspondante
+            if stars==None or line[1]==stars:
+                #si dispo dans les tirages
+                if line[5]==True:
                     pomme+=line[2]
                     is_exist=True
     if is_exist:
@@ -18,13 +20,16 @@ def tirage(file,stars=None):
             fined=False
             for line in f:
                 line=json.loads(line)
-                if not stars or line[1]==stars:
-                    if line[2]!=0 and line[5]==True:
+                if stars==None or line[1]==stars:
+                    if line[5]==True:
                         result-=line[2]
                         if result<=0 and not fined:
                             final_result={"name":line[0],"stars":line[1]}
-                            fined=True
+                            break
         return final_result
+    #si nombre d'étoiles détérminé non égal à zéro
+    elif stars:
+        return tirage(file,stars-1)
     else:
         return False
         
@@ -77,7 +82,7 @@ def votes(user,message):
     return False
 
 class Player:
-    def __init__(self,name,id,nb_gemmes=0 ,gemmes_spend=0,items=[],salon=1040228357981343764,pity=[0,0,10,50],votes=[],powers=[],historique=[],yato_tirages=0):
+    def __init__(self,name,id,nb_gemmes=0 ,gemmes_spend=0,items=[],salon=1040228357981343764,pity=[0,0,10,50,0,80],votes=[],powers=[],historique=[],yato_tirages=0):
         self.caracter=[name,id,nb_gemmes,gemmes_spend,items,salon,pity,votes,powers,historique,yato_tirages]
         self.file=Datas.player_file
     def update_stats_player_fichier(self):
@@ -170,6 +175,7 @@ class Player:
             result=None
             aléa = random.randint(1,5)
             print(aléa)
+            #yatoo
             if self.caracter[10]>0 and aléa==4:
                 result = "2 cristaux d'expeditions"
                 self.caracter[2]+=2
@@ -178,25 +184,58 @@ class Player:
                 all_items.append(result)
             else:
                 if tirage_4==False:
-                    if self.caracter[6][1]+1>=self.caracter[6][3]:
+                    print(self.caracter[6])
+                    #pity 6 étoiles
+                    if self.caracter[6][4]+1>=self.caracter[6][5]:
+                        result = tirage(files,6)
+                        if result:
+                            stars=6
+                        else:
+                            stars=0
+                    #pity 5 étoiles
+                    elif self.caracter[6][1]+1>=self.caracter[6][3]:
                         result =tirage(files,5)
+                        if result:
+                            stars=5
+                        else:
+                            stars=0
+                    #pity 4 étoiles
                     elif self.caracter[6][0]+1>=self.caracter[6][2]:
                         result = tirage(files,4)
+                        if result:
+                            stars=4
+                        else:
+                            stars=0
+                    #tirage classique
                     else:
                         result = tirage(files)
-                    if result and result['stars'] == 5:
+                        if result:
+                            stars=result['stars']
+                        else:
+                            stars=0
+                    #ajuste la pity en fonction du résultat
+                    if stars == 6:
+                        self.caracter[6][4]=0
+                        self.caracter[6][5]=80
+                        self.caracter[6][0]+=1
+                        self.caracter[6][1]+=1
+                        self.spend_gems(1)
+                    elif stars == 5:
                         self.caracter[6][1]=0
                         self.caracter[6][3]=50
+                        self.caracter[6][4]+=1
                         self.caracter[6][0]+=1
                         self.spend_gems(1)
-                    elif result and result['stars'] == 4:
+                    elif stars== 4:
                         self.caracter[6][0]=0
                         self.caracter[6][2]=10
+                        self.caracter[6][4]+=1
                         self.caracter[6][1]+=1
                         self.spend_gems(1)
-                    elif result:
+                    elif stars:
                         self.caracter[6][0]+=1
                         self.caracter[6][1]+=1
+                        self.caracter[6][4]+=1
                         self.spend_gems(1)
                 else:
                     result= tirage(files,4)

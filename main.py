@@ -77,11 +77,12 @@ async def on_message(message):
 
 
         if datetime.datetime.timestamp(message.created_at)>line["starttime"] and line["id_users"]==False and line["message_id"]==message.author.id:
+            #si question a initié et modo posant la question l'initie
             args={"nb_gemmes":line["nb_gemmes"],"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
             with open(Datas.question_file,'w') as f:
                 f.write(json.dumps(args))
         
-        elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("!question")==0 and global_functions.bon_role(message.author) and message.channel.id==Datas.channel_question:
+        elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("!question")==0 and global_functions.bon_role(message.author):
             #si y a le !question dans le message et bon_role
             args=message.content.split(" ")
             args[1]=int(args[1])
