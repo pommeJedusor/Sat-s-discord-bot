@@ -81,6 +81,9 @@ async def on_message(message):
             args={"nb_gemmes":line["nb_gemmes"],"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
             with open(Datas.question_file,'w') as f:
                 f.write(json.dumps(args))
+            #envoy le message de validation
+            parameter_channel = bot.get_channel(Datas.channel_message_bot)
+            await parameter_channel.send(f"<@{message.author.id}>la question de la semaine a été posée avec succès")
         
         elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("!question")==0 and global_functions.bon_role(message.author):
             #si y a le !question dans le message et bon_role
