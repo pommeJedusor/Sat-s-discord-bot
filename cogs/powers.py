@@ -50,14 +50,29 @@ class Powers(commands.Cog):
         player=global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         if {"id":Datas.panda_id,"active":True} in player.caracter[8]:
-            player.caracter[6][2]=9
-            player.caracter[6][3]=45
-            player.caracter[6][5]=72
+            #nombre de pandas possédé par le player
+            for item in player.caracter[4]:
+                if item["id"]==Datas.panda_id:
+                    item_numbers = item["nb"]
+
+            if item_numbers==1:
+                player.caracter[6][2]=9
+                player.caracter[6][3]=45
+                player.caracter[6][5]=72
+            elif item_numbers==2:
+                player.caracter[6][2]=9
+                player.caracter[6][3]=43
+                player.caracter[6][5]=68
+            elif item_numbers>=3:
+                player.caracter[6][2]=8
+                player.caracter[6][3]=40
+                player.caracter[6][5]=64
+
             for power in player.caracter[8]:
                 if power['id']==Datas.panda_id:
                     power['active']=False
             player.update_stats_player_fichier()
-            await interaction.response.send_message(f"votre pouvoir a bien été utilisé votre pity est désormais de : \n {player.caracter[6][0]}/{player.caracter[6][2]} pour les 4 étoiles \n {player.caracter[6][1]}/{player.caracter[6][3]} pour les 5 étoiles\n{player.caracter[6][4]}/{player.caracter[6][5]} pour les 6 étoiles")
+            await interaction.response.send_message(f"votre pouvoir a bien été utilisé votre pity est désormais de : \n {player.caracter[6][0]}/{player.caracter[6][2]} pour les 4 étoiles \n {player.caracter[6][1]}/{player.caracter[6][3]} pour les 5 étoiles\n {player.caracter[6][4]}/{player.caracter[6][5]} pour les 6 étoiles")
         elif {"id":Datas.panda_id,"active":False} in player.caracter[8]:
             await interaction.response.send_message("votre pouvoir est désactivé")
         else:
