@@ -114,7 +114,7 @@ class ItemsOwned(commands.Cog):
                 if i['nb']>=len(item.caracter[4]):
                     effet=item.caracter[4][-1]
                 else:
-                    effet=item.caracter[4][i['nb']]
+                    effet=item.caracter[4][i['nb']-1]
                 text+=f"l'item {item.caracter[0]} vous octroy l'effet: {effet} \n"
         if text !="":
             await interaction.response.send_message(text)
