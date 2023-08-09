@@ -214,21 +214,23 @@ class Player:
                         else:
                             stars=0
                     #ajuste la pity en fonction du résultat
+                    #reset panda dès l'obtention d'une min 4 étoiles
+                    if stars >= 4:
+                        self.caracter[6][5]=80
+                        self.caracter[6][3]=50
+                        self.caracter[6][2]=10
                     if stars == 6:
                         self.caracter[6][4]=0
-                        self.caracter[6][5]=80
                         self.caracter[6][0]+=1
                         self.caracter[6][1]+=1
                         self.spend_gems(1)
                     elif stars == 5:
                         self.caracter[6][1]=0
-                        self.caracter[6][3]=50
                         self.caracter[6][4]+=1
                         self.caracter[6][0]+=1
                         self.spend_gems(1)
                     elif stars== 4:
                         self.caracter[6][0]=0
-                        self.caracter[6][2]=10
                         self.caracter[6][4]+=1
                         self.caracter[6][1]+=1
                         self.spend_gems(1)
