@@ -56,6 +56,7 @@ class Arsmote(commands.Cog):
 
     @app_commands.command(name="arsmote",description="commande que je teste")
     async def arsmote(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         player=global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         items = []
@@ -71,13 +72,13 @@ class Arsmote(commands.Cog):
                     true_items.append({"name":item.caracter[0],"id":item.caracter[6]})
             if true_items:
                 view = DropdownView(self.bot,true_items)
-                await interaction.response.send_message("arsmote",view=view,ephemeral=True)
+                await interaction.edit_original_response(content="arsmote",view=view)
             else:
-                await interaction.response.send_message(f"vous n'avez pas eu de 4 étoiles lors de votre dernier tirage",ephemeral=True)
+                await interaction.edit_original_response(content=f"vous n'avez pas eu de 4 étoiles lors de votre dernier tirage")
         elif {"id":Datas.arsmote_id,"active":False} in player.caracter[8]:
-            await interaction.response.send_message(f"vous n'avez pas le pouvoir d'actif",ephemeral=True)
+            await interaction.edit_original_response(content=f"vous n'avez pas le pouvoir d'actif")
         else:
-            await interaction.response.send_message(f":x: **Vous n'avez pas l'objet requis pour effectuer cette commande.** :x:")
+            await interaction.edit_original_response(content=f":x: **Vous n'avez pas l'objet requis pour effectuer cette commande.** :x:")
 
 async def setup(bot):
     await bot.add_cog(Arsmote(bot))
