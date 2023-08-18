@@ -1,4 +1,4 @@
-#commandes pour les joueurs
+#  commandes pour les joueurs
 
 |gemmes||
 |---------|----------------|
@@ -27,7 +27,7 @@
 |help|permet d'accéder aux commandes, de faire une suggestion ou de report un bug|
 
 
-#commandes pour les modos
+# commandes pour les modos
 
 |gemmes||
 |---------|----------------|
@@ -63,7 +63,7 @@
 |oubli_question|dans le cas où la mention a été oublié puis ajouté par edit ou mis en dessous puis supprimé, si énième_message=1 prend le dernier message pour la question, si 2 l'avant dernier, etc|
 
 
-##précision
+## précision
 au lancement  
 - check si nouveaux messages dans question et agit en conséquence  
 - vérifie si il y a de nouveaux votes(hosts)  
