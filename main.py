@@ -33,12 +33,12 @@ async def on_ready():
         await on_message(message)
 
     #check si y a des nouveaux votes
-    vote = bot.get_channel(Datas.hosts_id)
-    async for pomme in vote.history(limit=1):
-        poire=pomme
-    for reaction in poire.reactions:
+    vote_channel = bot.get_channel(Datas.hosts_id)
+    async for message in vote_channel.history(limit=1):
+        message_vote=message
+    for reaction in message_vote.reactions:
         async for user in reaction.users():
-            if global_functions.votes(user,poire):
+            if global_functions.votes(user,message_vote):
                 await bot_channel.send(f"{user.name} a voté pour le host et gagné 1 gemme ")
     print("prêt")
 
@@ -58,9 +58,9 @@ async def on_raw_reaction_add(payload):
     channel=bot.get_channel(Datas.hosts_id)
     player=global_functions.Player(payload.member.name,payload.user_id)
     player.is_player()
-    if payload.message_id ==channel.last_message_id and not payload.message_id in player.caracter[7]:
-        player.caracter[7].append(payload.message_id)
-        player.caracter[2]+=1
+    if payload.message_id ==channel.last_message_id and not payload.message_id in player.votes:
+        player.votes.append(payload.message_id)
+        player.nb_gemmes+=1
         player.update_stats_player_fichier()
         bot_channel = bot.get_channel(Datas.channel_message_bot)
         await bot_channel.send(f"{payload.member.name} a voté pour le host et gagné 1 gemme ")
@@ -75,9 +75,6 @@ async def on_message(message):
             else:
                 line = {"nb_gemmes": 0, "id_users": [], "starttime": 0, "message_id": 0}
 
-
-
-        
         if datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("@everyone")>=0 and global_functions.bon_role(message.author):
             #si y a le @everyone dans le message et bon_role
             args={"nb_gemmes":2,"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
@@ -90,7 +87,7 @@ async def on_message(message):
             #si un joueur réponds à la question
             player=global_functions.Player(message.author.name,message.author.id)
             player.is_player()
-            player.caracter[2]+=line['nb_gemmes']
+            player.nb_gemmes+=line['nb_gemmes']
             line['id_users'].append(message.author.id)
             with open(Datas.question_file,"w") as f:
                 f.write(json.dumps(line))
