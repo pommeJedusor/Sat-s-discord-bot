@@ -5,11 +5,12 @@ edit the votes datas (for now it's a list of all votes) to keep only the last vo
 
 import sqlite3
 
-DATABASE = "SatBotDTB.DB"
+from datas.datas import Datas
+
 TABLES = ["Items","Item_Effects","Players","Player_items","Hosts","Questions","Answers","Powers"]
 
 def delete():
-    con = sqlite3.connect(DATABASE)
+    con = sqlite3.connect(Datas.DATABASE)
     cur = con.cursor()
 
     for table in TABLES:
@@ -21,7 +22,7 @@ def delete():
     con.close()
 
 def check():
-    con = sqlite3.connect(DATABASE)
+    con = sqlite3.connect(Datas.DATABASE)
     cur = con.cursor()
 
     #item table
@@ -116,4 +117,6 @@ def check():
     cur.close()
     con.close()
 
+check()
+delete()
 check()
