@@ -85,3 +85,58 @@ def delete_item(item_id):
     con.close()
 
     return True
+
+#players
+def add_player(player_id):
+    if get_player(player_id=player_id):
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("INSERT INTO `Players`(`player_id`) VALUES (?)", (player_id,))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def get_player(player_id):
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("SELECT * FROM `Players` WHERE `player_id`=?",(player_id,))
+    player = cur.fetchone()
+
+    cur.close()
+    con.close()
+
+    return player
+
+def update_player(player_id, gems_numbers, gems_spent, channel_id, Yato_tirage_number, pity_den_4, pity_den_5, pity_den_6, pity_num_4, pity_num_5, pity_num_6, last_question_answerd, last_vote_message_id):
+    if not get_player(player_id):
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("""
+                UPDATE `Players` 
+                SET `gems_numbers`=?, `gems_spent`=?, 
+                `channel_id`=?, `Yato_tirage_number`=?, 
+                `pity_den_4`=? , `pity_den_5`=?,
+                `pity_den_6`=? , `pity_num_4`=?,
+                `pity_num_5`=? , `pity_num_6`=?,
+                `last_question_answerd`=? , `last_vote_message_id`=?
+                WHERE `player_id`=?;"""
+                ,(gems_numbers, gems_spent, channel_id, Yato_tirage_number, pity_den_4, pity_den_5, pity_den_6, pity_num_4, pity_num_5, pity_num_6, last_question_answerd, last_vote_message_id,player_id))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def update_player_simple(player):
+    return update_player(player[0],player[1],player[2],player[3],player[4],player[5],player[6],player[7],player[8],player[9],player[10],player[11],player[12])

@@ -7,7 +7,7 @@ import sqlite3
 
 from datas.datas import Datas
 
-TABLES = ["Items","Item_Effects","Players","Player_items","Hosts","Questions","Answers","Powers"]
+TABLES = ["Items","Item_Effects","Players","Player_items","Questions","Powers"]
 
 def delete():
     con = sqlite3.connect(Datas.DATABASE)
@@ -47,8 +47,7 @@ def check():
     #player table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS `Players`
-        (`player_id` INTEGER PRIMARY KEY NOT NULL, 
-        `player_name` VARCHAR(65) NOT NULL,
+        (`player_id` INTEGER PRIMARY KEY NOT NULL,
         `gems_numbers` INTEGER NOT NULL DEFAULT 0, 
         `gems_spent` INTEGER NOT NULL DEFAULT 0, 
         `channel_id` INTEGER, 
@@ -59,8 +58,9 @@ def check():
         `pity_num_4` INTEGER NOT NULL DEFAULT 0, 
         `pity_num_5` INTEGER NOT NULL DEFAULT 0, 
         `pity_num_6` INTEGER NOT NULL DEFAULT 0,
-        `last_vote` INTEGER,
-        FOREIGN KEY(`last_vote`) REFERENCES `Hosts`(`id_host`)
+        `last_question_answerd` INTEGER,
+        `last_vote_message_id` INTEGER,
+        FOREIGN KEY(`last_question_answerd`) REFERENCES `Questions_Hosts`(`questions_hosts_id`)
         );""")
 
     #player_items table
@@ -72,16 +72,6 @@ def check():
         `numbers` INTEGER NOT NULL, 
         `last_tirage` BOOL NOT NULL,
         FOREIGN KEY(`item_id`) REFERENCES `Items`(`item_id`), 
-        FOREIGN KEY(`player_id`) REFERENCES `Players`(`player_id`)
-        );""")
-
-    #answer table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS `Answers`
-        (`answer_id` INTEGER PRIMARY KEY, 
-        `question_id` INT, 
-        `player_id` INT,
-        FOREIGN KEY(`question_id`) REFERENCES `Questions`(`question_id`), 
         FOREIGN KEY(`player_id`) REFERENCES `Players`(`player_id`)
         );""")
     
@@ -96,20 +86,12 @@ def check():
         FOREIGN KEY(`player_id`) REFERENCES `Players`(`player_id`)
         );""")
 
-    #host table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS `Hosts`
-        (`id_host` INTEGER PRIMARY KEY, 
-        `is_last` BOOL NOT NULL
-        );""")
-    
     #question table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS `Questions`
-        (`question_id` INTEGER PRIMARY KEY, 
+        (`questions_id` INTEGER PRIMARY KEY, 
         `reward` INTEGER NOT NULL, 
-        `is_last` BOOL NOT NULL, 
-        `timestamp` INTEGER NOT NULL
+        `message_id` INTEGER NOT NULL
         );""")
 
     con.commit()
