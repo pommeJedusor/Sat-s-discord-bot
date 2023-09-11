@@ -140,3 +140,52 @@ def update_player(player_id, gems_numbers, gems_spent, channel_id, Yato_tirage_n
 
 def update_player_simple(player):
     return update_player(player[0],player[1],player[2],player[3],player[4],player[5],player[6],player[7],player[8],player[9],player[10],player[11],player[12])
+
+#item effects
+def get_effect(item_id=False, effect_id=False, nb_items=100):
+    if (not effect_id and not item_id):
+        return False
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    if item_id:
+        cur.execute("SELECT * FROM `Item_Effects` WHERE `item_id`=? AND `item_number_required`<=?",(item_id,nb_items))
+    else:
+        cur.execute("SELECT * FROM `Item_Effects` WHERE `effect_id`=? AND `item_number_required`<=?",(effect_id,nb_items))
+    item_effects = cur.fetchall()
+
+    cur.close()
+    con.close()
+
+    return item_effects
+
+
+def add_effect(effect, item_number_required, item_id):
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("INSERT INTO `Item_Effects`(`effect`,`item_number_required`,`item_id`) VALUES(?,?,?)",(effect, item_number_required, item_id))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def delete_effect(effect_id):
+    if not get_effect(effect_id=effect_id):
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("DELETE FROM `Item_Effects` WHERE `effect_id`=?",(effect_id,))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def edit_effect():
+    pass

@@ -41,7 +41,9 @@ def check():
         CREATE TABLE IF NOT EXISTS `Item_Effects`
         (`effect_id` INTEGER PRIMARY KEY NOT NULL,
         `effect` TEXT,
-        `item_number_required` INTEGER NOT NULL DEFAULT 0
+        `item_number_required` INTEGER NOT NULL DEFAULT 0,
+        `item_id` INTEGER , 
+        FOREIGN KEY(`item_id`) REFERENCES `Items`(`item_id`)
         );""")
 
     #player table
