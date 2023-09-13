@@ -84,20 +84,40 @@ class Question(commands.Cog):
 
     @app_commands.command(name="voir_les_questions", description="permet de voir les question proposé par les joueurs")
     async def voir_les_questions(self,interaction:discord.Interaction):
-        data = [
+        data = []
 
-        ]
-
-        for i in range(1,15):
-            data.append({
-                "number": f"{i})",
-                "question": f"une question potentiellement intéressante mais potentiellement pas",
-                "votes": random.randint(1,5)
-            })
+        with open(PROPOSITON_QUESTION_FILE, 'r') as f:
+            compteur = 1
+            for line in f:
+                line = json.loads(line)
+                data.append({"number":f"{compteur})","question":line[1],"votes":line[2]})
+                compteur+=1
 
         pagination_view = PaginationView(timeout=None)
         pagination_view.data = data
         await pagination_view.send(interaction)
+
+    @app_commands.command(name="question_vote", description="permet de voter pour une proposition de question")
+    async def question_vote(self,interaction:discord.Interaction,question_number: int):
+        await interaction.response.defer(ephemeral=True)
+        with open(PROPOSITON_QUESTION_FILE,"r") as f:
+            compteur = 1
+            text=""
+            exist=False
+            for line in f:
+                line=json.loads(line)
+                if compteur==question_number:
+                    line[2]+=1
+                    exist=True
+                text+=json.dumps(line)+"\n"
+                compteur+=1
+        with open(PROPOSITON_QUESTION_FILE,"w") as f:
+            f.write(text)
+        
+        if not exist:
+            await interaction.edit_original_response(content="question non trouvé, veuillez à vérifier le nombre de la question entrée")
+        else:
+            await interaction.edit_original_response(content="vote ajouté avec scuccès")
 
     #players
     @app_commands.command(name="proposition_question", description="permet de proposer une question pour la question de la semaine")
