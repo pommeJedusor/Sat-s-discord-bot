@@ -118,6 +118,7 @@ class Question(commands.Cog):
                 for line in f:
                     compteur+=1
                     line=json.loads(line)
+                    line[2]=0
                     if compteur==question_number:
                         final_line = line
                         continue
