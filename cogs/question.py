@@ -93,7 +93,11 @@ class Question(commands.Cog):
                 for line in f:
                     line=json.loads(line)
                     if compteur==question_number:
+                        if interaction.user.id in line[3]:
+                            await interaction.edit_original_response(content="vous avez déjà voté pour cette question")
+                            return
                         line[2]+=1
+                        line[3].append(interaction.user.id)
                         exist=True
                     text+=json.dumps(line)+"\n"
                     compteur+=1
@@ -101,9 +105,9 @@ class Question(commands.Cog):
                 f.write(text)
             
             if not exist:
-                await interaction.edit_original_response(content="question non trouvé, veuillez à vérifier le nombre de la question entrée")
+                await interaction.edit_original_response(content="question non trouvé, veuillez vérifier le nombre de la question entrée")
             else:
-                await interaction.edit_original_response(content="vote ajouté avec scuccès")
+                await interaction.edit_original_response(content="vote ajouté avec succès")
         else:
             await interaction.edit_original_response(content="vous n'avez pas le bon rôle")
 
@@ -143,7 +147,7 @@ class Question(commands.Cog):
 
     @app_commands.command(name="voir_les_questions", description="permet de voir les question proposé par les joueurs")
     async def voir_les_questions(self,interaction:discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer()
         data = []
 
         with open(PROPOSITON_QUESTION_FILE, 'r') as f:
@@ -160,7 +164,7 @@ class Question(commands.Cog):
 class QuestionModal(discord.ui.Modal, title="proposition_question"):
     proposition_question = discord.ui.TextInput(label="proposition_question",style=discord.TextStyle.paragraph)
     async def on_submit(self, interaction: discord.Interaction):
-        proposition_question2 = [interaction.user.id,self.proposition_question.value,0]
+        proposition_question2 = [interaction.user.id,self.proposition_question.value,0,[]]
         for p in proposition_question2:
             print(p)
         with open(PROPOSITON_QUESTION_FILE,"a") as f:
