@@ -22,6 +22,11 @@
 |panda|réduit de 10% la pity pas réutilisable jusqu'à ce que les modos le réactive, nécéssite l'item panda|
 |arsmote|permet de relancer le tirage d'un item 4 étoiles obtenu lors du dernier tirage(peut réobtenir le même si pas de chance)|
 
+|questions||
+|---------|----------------|
+|proposition_question|ouvre un formulaire qui permet de proposer une question pour les questions de la semaine (si votre question est choisis vous serez récompensé par des gemmes)|
+|voir_les_questions|permet de regarder les questions déjà posé ainsi que leur nombres de votes(seules les modos peuvent voter)|
+
 |autres||
 |---------|----------------|
 |help|permet d'accéder aux commandes, de faire une suggestion ou de report un bug|
@@ -55,6 +60,12 @@
 |pouvoirs||
 |---------|----------------|
 |reset_power|permet de réactiver les pouvoirs Yato, panda et arsmote des joueurs|
+
+|questions||
+|---------|----------------|
+|voir_les_questions|permet de regarder les questions déjà posé ainsi que leur nombres de votes(seules les modos peuvent voter)|
+|recompense_question|permet en spécifiant le numero de la question(voir dans "voir_les_questions") de supprimer la question de la base de donnée et de récompenser le joueur d'un nombre de gemmes de votre choix, réinitialise également les votes|
+|question_vote|permet de voter pour une des questions en spécifiant le numero de la question(voir dans "voir_les_questions")|
 
 |autres||
 |---------|----------------|
