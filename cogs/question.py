@@ -10,7 +10,7 @@ from datas.datas import Datas
 
 import random
 
-PROPOSITON_QUESTION_FILE = "datas/datas_propositions_questions"
+PROPOSITON_QUESTION_FILE = "datas/datas_propositions_questions.txt"
 
 class Question(commands.Cog):
     def __init__(self, bot):
