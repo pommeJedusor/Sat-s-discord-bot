@@ -1,8 +1,3 @@
-"""
-edit the votes datas (for now it's a list of all votes) to keep only the last vote
-"""
-
-
 import sqlite3
 
 from datas.datas import Datas
@@ -101,6 +96,5 @@ def check():
     cur.close()
     con.close()
 
-check()
-delete()
+
 check()

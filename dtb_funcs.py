@@ -3,6 +3,14 @@ import sqlite3
 from datas.datas import Datas
 
 
+"""
+done:
+    player
+    items
+    player items
+    items effects
+"""
+
 #items
 def add_item(item_name, rarity, drop, image_link, on_tirage):
     if get_item(item_name=item_name):
@@ -142,7 +150,7 @@ def update_player_simple(player):
     return update_player(player[0],player[1],player[2],player[3],player[4],player[5],player[6],player[7],player[8],player[9],player[10],player[11],player[12])
 
 #item effects
-def get_effect(item_id=False, effect_id=False, nb_items=100):
+def get_effects(item_id=False, effect_id=False, nb_items=100):
     if (not effect_id and not item_id):
         return False
     con = sqlite3.connect(Datas.DATABASE)
@@ -173,7 +181,7 @@ def add_effect(effect, item_number_required, item_id):
     return True
 
 def delete_effect(effect_id):
-    if not get_effect(effect_id=effect_id):
+    if not get_effects(effect_id=effect_id):
         return False
     
     con = sqlite3.connect(Datas.DATABASE)
@@ -187,5 +195,82 @@ def delete_effect(effect_id):
 
     return True
 
-def edit_effect():
-    pass
+def edit_effect(effect_id, effect, item_number_required):
+    if not get_effects(effect_id=effect_id):
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("""
+                UPDATE `Item_Effects` 
+                SET `effect`=?, `item_number_required`=?
+                WHERE `effect_id`=?;"""
+                ,(effect, item_number_required, effect_id))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+#player items
+def get_player_item(player_id, item_id):
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("SELECT * FROM `Player_Items` WHERE `item_id`=? AND `player_id`=?",(item_id,player_id))
+    item_effects = cur.fetchone()
+
+    cur.close()
+    con.close()
+
+    return item_effects
+
+def add_player_item(item_id, player_id, numbers, last_tirage):
+    if get_player_item(item_id=item_id, player_id=player_id):
+        return False
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("INSERT INTO `Player_Items`(`item_id`,`player_id`,`numbers`,`last_tirage`) VALUES(?,?,?,?)",(item_id, player_id, numbers, last_tirage))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def delete_item_player(item_id, player_id):
+    if not get_player_item(player_id=player_id, item_id=item_id):
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("DELETE FROM `Player_Items` WHERE `item_id`=? and `player_id`=?;",(item_id,player_id))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def edit_player_item(item_id, player_id, numbers, last_tirage):
+    if not get_player_item(item_id=item_id, player_id=player_id):
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("""
+                UPDATE `Player_Items` 
+                SET `numbers`=?, `last_tirage`=?
+                WHERE `item_id`=? and `player_id`=?;"""
+                ,(numbers, last_tirage, item_id, player_id))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
