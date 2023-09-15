@@ -10,10 +10,10 @@ done:
     player items
     items effects
     Hosts
+    Questions
 
 needed:
     Powers
-    Questions
 """
 
 #items
@@ -319,6 +319,67 @@ def edit_host(message_id):
                 UPDATE `Hosts` 
                 SET `message_id`=?"""
                 ,(message_id,))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+#Questions
+def get_question():
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("SELECT * FROM `Questions`;")
+    question = cur.fetchone()
+
+    cur.close()
+    con.close()
+
+    return question
+
+def add_question(message_id, reward):
+    if get_question():
+        delete_question()
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("INSERT INTO `Questions`(`message_id`,`reward`) VALUES(?,?)",(message_id, reward))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def edit_question(reward):
+    if not get_question():
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("""
+                UPDATE `Questions` 
+                SET `reward`=?;"""
+                ,(reward, ))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def delete_question():
+    if not get_question():
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("DELETE FROM `Questions`;")
     con.commit()
 
     cur.close()
