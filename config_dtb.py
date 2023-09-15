@@ -2,7 +2,7 @@ import sqlite3
 
 from datas.datas import Datas
 
-TABLES = ["Items","Item_Effects","Players","Player_items","Questions","Powers"]
+TABLES = ["Items","Item_Effects","Players","Player_items","Questions","Powers","Hosts"]
 
 def delete():
     con = sqlite3.connect(Datas.DATABASE)
@@ -55,9 +55,8 @@ def check():
         `pity_num_4` INTEGER NOT NULL DEFAULT 0, 
         `pity_num_5` INTEGER NOT NULL DEFAULT 0, 
         `pity_num_6` INTEGER NOT NULL DEFAULT 0,
-        `last_question_answerd` INTEGER,
-        `last_vote_message_id` INTEGER,
-        FOREIGN KEY(`last_question_answerd`) REFERENCES `Questions_Hosts`(`questions_hosts_id`)
+        `last_question_answerd_message_id` INTEGER,
+        `last_vote_message_id` INTEGER
         );""")
 
     #player_items table
@@ -90,11 +89,19 @@ def check():
         `reward` INTEGER NOT NULL, 
         `message_id` INTEGER NOT NULL
         );""")
+    
+    #hosts table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS `Hosts`
+        (`host_id` INTEGER PRIMARY KEY, 
+        `message_id` INTEGER NOT NULL
+        );""")
 
     con.commit()
 
     cur.close()
     con.close()
 
-
+check()
+delete()
 check()

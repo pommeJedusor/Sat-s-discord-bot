@@ -9,6 +9,11 @@ done:
     items
     player items
     items effects
+    Hosts
+
+needed:
+    Powers
+    Questions
 """
 
 #items
@@ -136,7 +141,7 @@ def update_player(player_id, gems_numbers, gems_spent, channel_id, Yato_tirage_n
                 `pity_den_4`=? , `pity_den_5`=?,
                 `pity_den_6`=? , `pity_num_4`=?,
                 `pity_num_5`=? , `pity_num_6`=?,
-                `last_question_answerd`=? , `last_vote_message_id`=?
+                `last_question_answerd_message_id`=? , `last_vote_message_id`=?
                 WHERE `player_id`=?;"""
                 ,(gems_numbers, gems_spent, channel_id, Yato_tirage_number, pity_den_4, pity_den_5, pity_den_6, pity_num_4, pity_num_5, pity_num_6, last_question_answerd, last_vote_message_id,player_id))
     con.commit()
@@ -220,12 +225,12 @@ def get_player_item(player_id, item_id):
     cur = con.cursor()
 
     cur.execute("SELECT * FROM `Player_Items` WHERE `item_id`=? AND `player_id`=?",(item_id,player_id))
-    item_effects = cur.fetchone()
+    player_item = cur.fetchone()
 
     cur.close()
     con.close()
 
-    return item_effects
+    return player_item
 
 def add_player_item(item_id, player_id, numbers, last_tirage):
     if get_player_item(item_id=item_id, player_id=player_id):
@@ -241,7 +246,7 @@ def add_player_item(item_id, player_id, numbers, last_tirage):
 
     return True
 
-def delete_item_player(item_id, player_id):
+def delete_player_item(item_id, player_id):
     if not get_player_item(player_id=player_id, item_id=item_id):
         return False
     
@@ -268,6 +273,52 @@ def edit_player_item(item_id, player_id, numbers, last_tirage):
                 SET `numbers`=?, `last_tirage`=?
                 WHERE `item_id`=? and `player_id`=?;"""
                 ,(numbers, last_tirage, item_id, player_id))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+#hosts
+def get_host():
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("SELECT * FROM `Hosts`;")
+    host = cur.fetchone()
+
+    cur.close()
+    con.close()
+
+    return host
+
+def add_host(message_id):
+    if get_host():
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("INSERT INTO `Hosts`(`message_id`) VALUES(?)",(message_id,))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def edit_host(message_id):
+    if not get_host():
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("""
+                UPDATE `Hosts` 
+                SET `message_id`=?"""
+                ,(message_id,))
     con.commit()
 
     cur.close()
