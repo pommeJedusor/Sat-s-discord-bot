@@ -3,19 +3,6 @@ import sqlite3
 from datas.datas import Datas
 
 
-"""
-done:
-    player
-    items
-    player items
-    items effects
-    Hosts
-    Questions
-
-needed:
-    Powers
-"""
-
 #items
 def add_item(item_name, rarity, drop, image_link, on_tirage):
     if get_item(item_name=item_name):
@@ -386,3 +373,61 @@ def delete_question():
     con.close()
 
     return True
+
+#Powers
+def get_power(item_id, player_id):
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("SELECT * FROM `Powers` WHERE `item_id`=? AND `player_id`=?;",(item_id, player_id))
+    power = cur.fetchone()
+
+    cur.close()
+    con.close()
+
+    return power
+
+
+def add_power(item_id, player_id, is_active):
+    if get_power(item_id, player_id):
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("INSERT INTO `Powers`(`item_id`,`player_id`,`is_active`) VALUES(?,?,?)",(item_id, player_id, is_active))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+def edit_power(item_id, player_id, is_active):
+    if not get_power(item_id, player_id):
+        return False
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("""
+                UPDATE `Powers` 
+                SET `is_active`=?
+                WHERE `item_id`=? AND `player_id`=?;"""
+                ,(is_active, item_id, player_id))
+    con.commit()
+
+    cur.close()
+    con.close()
+
+    return True
+
+print(get_power(1,1))
+print(edit_power(1,1,1))
+print(get_power(1,1))
+print(add_power(1,1,1))
+print(get_power(1,1))
+print(add_power(1,1,0))
+print(get_power(1,1))
+print(edit_power(1,1,0))
+print(get_power(1,1))
