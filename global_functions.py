@@ -269,6 +269,7 @@ class Player:
                 self.historique.append(item.id)
         self.update_stats_player_fichier()
         return all_items
+
 class Items:
     def __init__(self,name,stars=0,drop=0,url_img="",effects=[],on_tirage=True,id=random.randint(1,1000000000)):
         self.name = name
@@ -281,6 +282,8 @@ class Items:
     
     def update_from_sql_r(self, sql_r):
         self.id, self.name, self.stars, self.drop, self.url_img, self.on_tirage=sql_r
+        effects = dtb_funcs.get_effects(item_id=self.id)
+        self.effects = [{"effect":effect[1],"number_required":effect[2]} for effect in effects]
 
     def is_item(self, by_name=True):
         """vérifie si l'item existe renvoi et le retourne"""
