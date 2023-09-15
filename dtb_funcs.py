@@ -421,13 +421,3 @@ def edit_power(item_id, player_id, is_active):
     con.close()
 
     return True
-
-print(get_power(1,1))
-print(edit_power(1,1,1))
-print(get_power(1,1))
-print(add_power(1,1,1))
-print(get_power(1,1))
-print(add_power(1,1,0))
-print(get_power(1,1))
-print(edit_power(1,1,0))
-print(get_power(1,1))
