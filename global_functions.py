@@ -1,38 +1,34 @@
 import random, json
 
 from datas.datas import Datas
+import dtb_funcs
 
-def tirage(file,stars=None):
-    is_exist=False
-    with open(file,'r') as f:
-        pomme=0
-        for line in f:
-            line=json.loads(line)
-            #si pas de nombre d'étoiles précise ou correspondante
-            if stars==None or line[1]==stars:
-                #si dispo dans les tirages
-                if line[5]==True:
-                    pomme+=line[2]
-                    is_exist=True
+ITEM_NAME = 1
+ITEM_STARS = 2
+ITEM_DROP = 3
+
+def tirage(stars=None):
+    is_exist = False
+    total_drop = 0
+    items = dtb_funcs.get_items_ontirage()
+    for item in items:
+        if stars==None or item[ITEM_STARS]==stars:
+            total_drop+=item[ITEM_DROP]
+            is_exist = True
+
     if is_exist:
-        result = random.randint(1,pomme)
-        with open(file,'r') as f:
-            fined=False
-            for line in f:
-                line=json.loads(line)
-                if stars==None or line[1]==stars:
-                    if line[5]==True:
-                        result-=line[2]
-                        if result<=0 and not fined:
-                            final_result={"name":line[0],"stars":line[1]}
-                            break
+        result_drop = random.randint(1, total_drop)
+        for item in items:
+            if stars==None or item[ITEM_STARS]==stars:
+                result_drop-=item[ITEM_DROP]
+                if result_drop <= 0:
+                    final_result={"name":item[ITEM_NAME],"stars":item[ITEM_STARS]}
+                    break
         return final_result
-    #si nombre d'étoiles détérminé non égal à zéro
     elif stars:
-        return tirage(file,stars-1)
+        return tirage(stars-1)
     else:
         return False
-        
 
 
 def update(self,file,num_param):
@@ -132,7 +128,7 @@ class Player:
     def lose_item(self,item_id,nb):
         pomme=True
         item=Items("pomme",id=item_id)
-        if item.is_item(x=6):
+        if item.is_item(False):
             x=0
             for item2 in self.items:
                 if item2['id']==item.id and pomme and item2['nb']>nb:
@@ -169,7 +165,7 @@ class Player:
             pomme=True
             is_item=Items("pomme",id=item['id'])
             for item2 in self.items:
-                if is_item.is_item(x=6) and (is_item.id) == item2['id'] and pomme:
+                if is_item.is_item(False) and (is_item.id) == item2['id'] and pomme:
                     self.items[x]['nb']+=item["nb"]
                     pomme=False
                 x+=1
@@ -205,28 +201,28 @@ class Player:
                     print(self.pity)
                     #pity 6 étoiles
                     if self.pity[4]+1>=self.pity[5]:
-                        result = tirage(files,6)
+                        result = tirage(6)
                         if result:
                             stars=6
                         else:
                             stars=0
                     #pity 5 étoiles
                     elif self.pity[1]+1>=self.pity[3]:
-                        result =tirage(files,5)
+                        result =tirage(5)
                         if result:
                             stars=5
                         else:
                             stars=0
                     #pity 4 étoiles
                     elif self.pity[0]+1>=self.pity[2]:
-                        result = tirage(files,4)
+                        result = tirage(4)
                         if result:
                             stars=4
                         else:
                             stars=0
                     #tirage classique
                     else:
-                        result = tirage(files)
+                        result = tirage()
                         if result:
                             stars=result['stars']
                         else:
@@ -258,7 +254,7 @@ class Player:
                         self.pity[4]+=1
                         self.spend_gems(1)
                 else:
-                    result= tirage(files,4)
+                    result= tirage(4)
                 if result:
                     new_item=Items(result['name'])
                     new_item.is_item()
@@ -282,37 +278,37 @@ class Items:
         self.effects = effects
         self.on_tirage = on_tirage
         self.id = id
-        self.file=Datas.items_file
+    
+    def update_from_sql_r(self, sql_r):
+        self.id, self.name, self.stars, self.drop, self.url_img, self.on_tirage=sql_r
 
-    def get_jsonline(self):
-        return [self.name,self.stars,self.drop,self.url_img,self.effects,self.on_tirage,self.id]
-
-    def update_from_json_line(self, jsonline):
-        self.name,self.stars,self.drop,self.url_img,self.effects,self.on_tirage,self.id=jsonline
-
-    def is_item(self,x=0):
+    def is_item(self, by_name=True):
         """vérifie si l'item existe renvoi et le retourne"""
-        with open(self.file,"r") as f:
-            for line in f:
-                line=json.loads(line)
-                if line[x]==self.get_jsonline()[x]:
-                    self.update_from_json_line(line)
-                    return True
-            return False
+        if by_name:
+            item = dtb_funcs.get_item(item_name=self.name)
+            if item:
+                self.update_from_sql_r(item)
+                return True
+
+        else:
+            item = dtb_funcs.get_item(item_id=self.id)
+            if item:
+                self.update_from_sql_r(item)
+                return True
+        
+        return False
+    
     def update_item(self):
-        """actualise le fichier avec les données actuels de l'instance"""
-        return update(self,self.file,6)
+        return dtb_funcs.update_item(self.id, self.name, self.stars, self.drop, self.url_img, self.on_tirage)
+
     def add_item(self):
-        """ajoute l'item au fichier retourne faux si il existe déja"""
+        """créer l'item retourne faux si il existe déja"""
         if self.is_item():
             return False
         else:
-            with open(self.file,"a") as f:
-                f.write(json.dumps(self.get_jsonline())+"\n")
-                return True
+            dtb_funcs.add_item(self.name, self.stars, self.drop, self.url_img, self.on_tirage)
+            return True
+
     def delete_item(self):
         """supprime l'item du fichier si il existe"""
-        if not self.is_item():
-            return False
-        else:
-            delete_line(self)
+        return dtb_funcs.delete_item(self.id)
