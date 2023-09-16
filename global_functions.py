@@ -7,6 +7,13 @@ ITEM_NAME = 1
 ITEM_STARS = 2
 ITEM_DROP = 3
 
+PITYN4 = 0
+PITYD4 = 1
+PITYN5 = 2
+PITYD5 = 3
+PITYN6 = 4
+PITYD6 = 5
+
 def tirage(stars=None):
     is_exist = False
     total_drop = 0
@@ -30,38 +37,6 @@ def tirage(stars=None):
     else:
         return False
 
-
-def update(self,file,num_param):
-        """fichier, numero du parametre dans le fichier,actualise les données"""
-        with open(file,"r") as f:
-            text=""
-            exist=False
-            for line in f:
-                line=json.loads(line)
-                if line[num_param]==self.get_jsonline()[num_param]:
-                    line=self.get_jsonline()
-                    exist=True
-                text+=json.dumps(line)+"\n"
-        with open(file,"w") as f:
-            f.write(text)
-        if exist:
-            return True
-        else:
-            return False
-def add_line(self,file):
-    """ajoute au fichier la ligne correspondant à l'item ou au joueur"""
-    with open(file,"a") as f:
-        f.write(json.dumps(self.get_jsonline())+"\n")
-def delete_line(self):
-    """supprime du fichier la ligne correspondante à l'instance"""
-    with open(self.file,"r") as f:
-        text=""
-        for line in f:
-            if not json.loads(line)==self.get_jsonline():
-                text+=line
-    with open(self.file,"w") as f:
-        f.write(text)
-
 def bon_role(user):
     for r in user.roles:
         if r.id in Datas.role_modo:
@@ -70,134 +45,101 @@ def bon_role(user):
 def votes(user,message):
     player=Player(user.name,user.id)
     player.is_player()
-    if not message.id in player.votes:
-        player.votes.append(message.id)
+    if not message.id == player.last_vote:
+        player.last_vote = message.id
         player.nb_gemmes+=1
-        player.update_stats_player_fichier()
+        player.update_stats_player()
         return True
     return False
 
 class Player:
-    def __init__(self,name,id,nb_gemmes=0 ,gemmes_spend=0,items=[],salon=1040228357981343764,pity=[0,0,10,50,0,80],votes=[],powers=[],historique=[],yato_tirages=0):
-        self.name = name
+    def __init__(self,name,id,nb_gemmes=0 ,gemmes_spend=0,items=[],salon=1040228357981343764,pity=[0,0,10,50,0,80],last_vote=None,powers=[],historique=[],yato_tirages=0, last_question_answerd=None):
         self.id = id
+        self.name = name
         self.nb_gemmes = nb_gemmes
         self.gemmes_spend = gemmes_spend
-        self.items = items
         self.salon = salon
         self.pity = pity
-        self.votes = votes
-        self.powers = powers
-        self.historique = historique
         self.yato_tirages = yato_tirages
-        self.file=Datas.player_file
+        self.last_vote = last_vote
+        self.last_question_answerd = last_question_answerd
+        self.items = items
+        self.powers = powers
     
-    def get_jsonline(self):
-        return [self.name,self.id,self.nb_gemmes,self.gemmes_spend,self.items,self.salon,self.pity,self.votes,self.powers,self.historique,self.yato_tirages]
 
-    def update_from_json_line(self, jsonline):
-        self.name,self.id,self.nb_gemmes,self.gemmes_spend,self.items,self.salon,self.pity,self.votes,self.powers,self.historique,self.yato_tirages = jsonline
+    def update_from_sql(self, sql):
+        self.id,self.nb_gemmes,self.gemmes_spend,self.salon,self.yato_tirages,dp4,dp5,dp6,np4,np5,np6,self.last_question_answerd,self.last_vote = sql
+        self.pity = [np4,dp4,np5,dp5,np6,dp6]
+        self.items
+        self.powers
 
-
-    def update_stats_player_fichier(self):
-        """actualise le fichier avec les données actuels de l'instance"""
-        return update(self,self.file,1)
+    def update_stats_player(self):
+        """actualise la base de données avec les données actuels de l'instance"""
+        return dtb_funcs.update_player(self.id, self.nb_gemmes, self.gemmes_spend, self.salon, self.yato_tirages, self.pity[PITYN4], self.pity[PITYD4], self.pity[PITYN5], self.pity[PITYD5], self.pity[PITYN6], self.pity[PITYD6],self.last_question_answerd,self.last_vote)
+    
     def is_player(self):
         """
-        vérifie l'occurence dans la base de donnés à partir de l'id si oui actualise les données de l'instance sinon le rajoute dans le fichier avec les données actuels de l'instance
+        vérifie l'occurence dans la base de donnés à partir de l'id si présent actualise les données de l'instance sinon le rajoute dans le fichier avec les données actuels de l'instance
         """
-        with open(self.file,"r") as f:
-            for line in f:
-                line=json.loads(line)
-                if line[1]==self.id:
-                    self.update_from_json_line(line)
-                    return True
-        if not self.update_stats_player_fichier():
-            add_line(self,self.file)
-            return False
+        player = dtb_funcs.get_player(self.id)
+        if player:
+            self.update_from_sql(player)
+            return True
+        
+        dtb_funcs.add_player(self.id)
+        
     def spend_gems(self,nb):
         """dépense les gemmes d'un joueur"""
         if self.nb_gemmes>=nb>0:
             self.nb_gemmes-=nb
             self.gemmes_spend+=nb
-            self.update_stats_player_fichier()
+            self.update_stats_player()
             return True
         else:
             return False
         
     def lose_item(self,item_id,nb):
-        pomme=True
-        item=Items("pomme",id=item_id)
-        if item.is_item(False):
-            x=0
-            for item2 in self.items:
-                if item2['id']==item.id and pomme and item2['nb']>nb:
-                    item2['nb']-=nb
-                    pomme=False
-                elif item2['id']==item.id and pomme and item2['nb']==nb:
-                    del self.items[x]
-                    power = lambda pow:pow["id"]==item2["id"]
-                    powers = list(filter(power,self.powers))
-                    print(powers)
-                    pomme=0
-                    if powers:
-                        for i in range(len(self.powers)):
-                            print(powers[0])
-                            print(self.powers[i]["id"])
-                            if self.powers[i]["id"] == powers[0]["id"]:
-                                print("yop")
-                                pomme=i+1
-                        if pomme:
-                            del self.powers[pomme-1]
-                    pomme=False
-                x+=1
-        self.update_stats_player_fichier()
-        if pomme:
-            return False
-        else:
+        item = dtb_funcs.get_player_item(self.id, item_id)
+        #if he's still gonna have the item after
+        if item[3] > nb:
+            dtb_funcs.edit_player_item(item_id=item_id,player_id=self.id,numbers=item[3]-nb,last_tirage=item[4])
             return True
+        elif item[3] == nb:
+            dtb_funcs.delete_player_item(item_id, self.id)
+            return True
+        else:
+            return False
 
 
-    def add_item(self,items):
+    def add_items(self,items):
         """ajoute les items au joueur"""
-        x=0
         for item in items:
-            pomme=True
-            is_item=Items("pomme",id=item['id'])
-            for item2 in self.items:
-                if is_item.is_item(False) and (is_item.id) == item2['id'] and pomme:
-                    self.items[x]['nb']+=item["nb"]
-                    pomme=False
-                x+=1
-            if pomme==True:
-                self.items.append({"id":is_item.id,"nb":item["nb"]})
-                pomme=False
-                if is_item.id==Datas.panda_id:
-                    if not {"id":Datas.panda_id,"active":True} in self.powers or not {"id":Datas.panda_id,"active":False} in self.powers:
-                        self.powers.append({"id":Datas.panda_id,"active":True})
-                elif is_item.id==Datas.arsmote_id:
-                    if not {"id":Datas.arsmote_id,"active":True} in self.powers or not {"id":Datas.arsmote_id,"active":False} in self.powers:
-                        self.powers.append({"id":Datas.arsmote_id,"active":True})
-                elif is_item.id==Datas.Yato_id:
-                    if not {"id":Datas.Yato_id,"active":True} in self.powers or not {"id":Datas.Yato_id,"active":False} in self.powers:
-                        self.powers.append({"id":Datas.Yato_id,"active":True})
-        self.update_stats_player_fichier()
+            item_db = dtb_funcs.get_item(item_id=item["id"])
+            if item_db:
+                dtb_funcs.edit_player_item(item_db[1],item_db[2],item_db[3]+item["nb"],item_db[4])
+            else:
+                dtb_funcs.add_player_item(item["id"],self.id,item["nb"],False)
+
     def tirages(self,nb_tirage,tirage_4=False):
-        files=Datas.items_file
         all_items=[]
         for i in range(nb_tirage):
             result=None
-            aléa = random.randint(1,5)
-            print(aléa)
+            yato_aléa = random.randint(1,5)
+            print(yato_aléa)
             #yatoo
-            if self.yato_tirages>0 and aléa==4:
+            if self.yato_tirages>0 and yato_aléa==4:
                 result = "2 cristaux d'expeditions"
                 self.nb_gemmes+=2
-                self.update_stats_player_fichier()
                 self.spend_gems(1)
+                self.update_stats_player_fichier()
                 all_items.append(result)
             else:
-                if tirage_4==False:
+                #arsmote
+                if tirage_4==True:
+                    #potentiel problème si pas de 4 étoiles
+                    result = tirage(4)
+
+                else:
                     print(self.pity)
                     #pity 6 étoiles
                     if self.pity[4]+1>=self.pity[5]:
@@ -253,20 +195,15 @@ class Player:
                         self.pity[1]+=1
                         self.pity[4]+=1
                         self.spend_gems(1)
-                else:
-                    result= tirage(4)
                 if result:
                     new_item=Items(result['name'])
                     new_item.is_item()
-                    self.add_item([{"id":new_item.id,"nb":1}])
+                    self.add_items([{"id":new_item.id,"nb":1}])
                     all_items.append(new_item)
             #réduit de 1 la variable yato
             if self.yato_tirages>0:
                 self.yato_tirages-=1
-        self.historique=[]
-        for item in all_items:
-            if not item=="2 cristaux d'expeditions":
-                self.historique.append(item.id)
+                
         self.update_stats_player_fichier()
         return all_items
 
