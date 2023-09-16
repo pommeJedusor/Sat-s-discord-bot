@@ -267,6 +267,20 @@ def edit_player_item(item_id, player_id, numbers, last_tirage):
 
     return True
 
+def delast_player_item(player_id):
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("""
+                UPDATE `Player_Items` 
+                SET `last_tirage`=?
+                WHERE `player_id`=?;"""
+                ,(False, player_id))
+    con.commit()
+
+    cur.close()
+    con.close()
+
 #hosts
 def get_host():
     con = sqlite3.connect(Datas.DATABASE)
