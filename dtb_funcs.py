@@ -219,6 +219,26 @@ def get_player_item(player_id, item_id):
 
     return player_item
 
+def get_player_items(player_id=False, item_id=False):
+    if not player_id and not item_id:
+        return False
+    if player_id and item_id:
+        return get_player_item(player_id,item_id)
+    
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    if player_id:
+        cur.execute("SELECT * FROM `Player_Items` WHERE `player_id`=?",(player_id,))
+    else:
+        cur.execute("SELECT * FROM `Player_Items` WHERE `item_id`=?",(item_id,))
+    player_items = cur.fetchall()
+
+    cur.close()
+    con.close()
+
+    return player_items
+
 def add_player_item(item_id, player_id, numbers, last_tirage):
     if get_player_item(item_id=item_id, player_id=player_id):
         return False
