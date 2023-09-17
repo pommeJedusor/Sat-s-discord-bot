@@ -21,7 +21,7 @@ class Tirage(commands.Cog):
         player.is_player()
         if global_functions.bon_role(interaction.user):
             player.salon=interaction.channel_id
-            player.update_stats_player_fichier()
+            player.update_stats_player()
             await interaction.edit_original_response(content=f"{Datas.emogi_cristal}** Le Salon perso de __{user}__ est désormais __{interaction.channel.name}__. ** {Datas.emogi_cristal}")
         else:
             await interaction.edit_original_response(content="vous n'avez pas le bon role")
@@ -42,20 +42,20 @@ class Tirage(commands.Cog):
             await interaction.response.defer()
             player = global_functions.Player(user.name,user.id)
             player.is_player()
-            if not numérateur_5:
-                numérateur_5=player.pity[1]
             if not numérateur_4:
                 numérateur_4=player.pity[0]
             if not dénominateur_4:
-                dénominateur_4=player.pity[2]
+                dénominateur_4=player.pity[1]
+            if not numérateur_5:
+                numérateur_5=player.pity[2]
             if not dénominateur_5:
                 dénominateur_5=player.pity[3]
             if not numérateur_6:
                 numérateur_6=player.pity[4]
             if not dénominateur_6:
                 dénominateur_6=player.pity[5]
-            player.pity = [numérateur_4,numérateur_5,dénominateur_4,dénominateur_5,numérateur_6,dénominateur_6]
-            player.update_stats_player_fichier()
+            player.pity = [numérateur_4,dénominateur_4,numérateur_5,dénominateur_5,numérateur_6,dénominateur_6]
+            player.update_stats_player()
             await interaction.edit_original_response(content=f"le joueur {user.name} a désormais comme pity: \npour 4 étoiles: {player.pity[0]}/{player .pity[2]} \npour 5 étoiles {player.pity[1]}/{player .pity[3]} \net pour 6 étoiles: {player.pity[4]}/{player .pity[5]} ")
         else:
              await interaction.edit_original_response(content="vous n'avez pas le bon role")   
@@ -72,39 +72,16 @@ class Tirage(commands.Cog):
             tirage_en_cours = True
             await interaction.edit_original_response(content=f"vous avez obtenus...")
 
-            #yato
-            """if player.yato_tirages>0:
-                if nombre_de_tirage>player.yato_tirages:
-                    nombre_de_tentative_gemmes=player.yato_tirages
-                else:
-                    nombre_de_tentative_gemmes=nombre_de_tirage
-                compteur_de_gemmes=0
-                for i in range(nombre_de_tentative_gemmes):
-                    if random.randint(1,5)==4:
-                        compteur_de_gemmes+=1
-                        nombre_de_tirage-=1
-                        player.nb_gemmes+=1
-                        player.gemmes_spend+=1
-                    player.yato_tirages-=1
-                player.update_stats_player_fichier()
-                for i in range(compteur_de_gemmes):
-                    await channel_perso.send("vous avez gagné 2 gemmes")
-                    if not interaction.channel==channel_perso:
-                        await interaction.channel.send("vous avez gagné 2 gemmes")
-                    await asyncio.sleep(2)
-            player.update_stats_player_fichier()"""
-
-            
             for i in player.tirages(nombre_de_tirage):
                 if not type(i)==str:  
                     i.is_item()
                     await asyncio.sleep(i.stars)
-                    if player.salon!=1040228357981343764:
+                    if player.salon:
                         await channel_perso.send(f"{i.name} : {i.stars} étoiles :")
                     if not interaction.channel==channel_perso:
                         await interaction.channel.send(f"{i.name} : {i.stars} étoiles :")
                     if i.url_img:
-                        if player.salon!=1040228357981343764:
+                        if player.salon:
                             await channel_perso.send(f"{i.url_img}")
                         if not interaction.channel==channel_perso:
                             await interaction.channel.send(f"{i.url_img}")
