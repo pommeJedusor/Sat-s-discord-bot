@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 from discord import app_commands
 
-import global_functions
+import global_functions, dtb_funcs
 from datas.datas import Datas
 
 class ItemsOwned(commands.Cog):
@@ -18,7 +18,7 @@ class ItemsOwned(commands.Cog):
             player.is_player()
             item=global_functions.Items(name)
             if item.is_item() and nombre>0:
-                player.add_item([{"id":item.id,"nb":nombre}])
+                player.add_items([{"id":item.id,"nb":nombre}],tirage=False)
                 await interaction.edit_original_response(content=f":gift: **L'objet __{name}__ (x{nombre}) a bien été ajouté à {user.name}** :gift:")
             elif not item.is_item():
                 await interaction.edit_original_response(content=f"{name} n'as pas été trouvé")
@@ -35,22 +35,17 @@ class ItemsOwned(commands.Cog):
             player.is_player()
             item=global_functions.Items(name)
             if item.is_item():
-                item_filter = lambda items: items["id"]==item.id
-                item_player = list(filter(item_filter,player.items))
-                if len(item_player)>1:
-                    print(f"l'item{item} avec l'id {item.id} apparait plusieur fois chez {player}")
+                player_item = dtb_funcs.get_player_item(player.id, item.id)
 
-                if item_player and item_player[0]["nb"]>=nombre>0:
-                    item_player = item_player[0]
-                    player.lose_item(item.id,nombre)
-                    await interaction.edit_original_response(content=f"l'item {name} a bien été retiré {nombre} fois à {user.name}")
-                
-                elif not item_player:
+                if not player_item:
                     await interaction.edit_original_response(content=f"{user.name} ne possède pas l'item {name} ")
-                elif not item_player[0]["nb"]>=nombre:
-                    await interaction.edit_original_response(content=f"vous essayer de retirer {nombre} fois l'item {name} à {user.name} qui ne le possède que {item_player[0]['nb']} fois")
+                elif player_item[3]<nombre:
+                    await interaction.edit_original_response(content=f"vous essayer de retirer {nombre} fois l'item {name} à {user.name} qui ne le possède que {player_item[3]} fois")
                 else:
-                    await interaction.edit_original_response(content=f"vous ne pouvez retirer qu'un nombre positif d'objets à un joueur")
+                    if player.lose_item(item.id,nombre):
+                        await interaction.edit_original_response(content=f"l'item {name} a bien été retiré {nombre} fois à {user.name}")
+                    else:
+                        await interaction.edit_original_response(content="échec pour des raisons inconnues")
             else:
                 await interaction.edit_original_response(content=f"{name} n'as pas été trouvé")
         else:
@@ -60,21 +55,19 @@ class ItemsOwned(commands.Cog):
     async def see_items_of_a_player(self,interaction:discord.Interaction, user:discord.Member):
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user):
+            text = ""
             player = global_functions.Player(user.name,user.id)
             player.is_player()
-            text=""
-            items_tried = []
-            for i in range(1,7):
-                for item in player.items:
-                    iteme=global_functions.Items("pomme",id=item['id'])
-                    iteme.is_item(x=6)
-                    if iteme.stars==i:
-                        items_tried.append(item)
-            for item in items_tried:
-                iteme=global_functions.Items("pomme",id=item['id'])
-                iteme.is_item(x=6)
-                stars = "".join([":star:" for i in range(iteme.stars)])
-                text+=f"{stars} - **{iteme.name} (x{item['nb']}) **\n"
+
+            player_items = dtb_funcs.get_player_items(player_id=player.id)
+            for i in range(7):
+                for player_item in player_items:
+                    item = global_functions.Items("pomme",id=player_item[1])
+                    item.is_item(by_name=False)
+                    if item.stars==i:
+                        stars = "".join([":star:" for i in range(item.stars)])
+                        text+=f"{stars} - **{item.name} (x{player_item[3]}) **\n"
+
             if text:
                 await interaction.edit_original_response(content=text)
             else:
@@ -84,6 +77,9 @@ class ItemsOwned(commands.Cog):
     
     @app_commands.command(name="see_effects_of_a_player",description="permet de voir les effets d'un joueur")
     async def see_effects_of_a_player(self,interaction: discord.Interaction, user:discord.Member):
+        """
+        not done for now
+        """
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user):
             player=global_functions.Player(user.name,user.id)
@@ -108,6 +104,9 @@ class ItemsOwned(commands.Cog):
     #players
     @app_commands.command(name="see_effects",description="permet de voir ses effets")
     async def see_effects(self,interaction: discord.Interaction):
+        """
+        not done for now
+        """
         await interaction.response.defer()
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
@@ -132,23 +131,23 @@ class ItemsOwned(commands.Cog):
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         text=""
-        if player.items:
-            text+=f"**   {Datas.emogi_cristal} Ton inventaire : {Datas.emogi_cristal}**\n\n"
-            text+=f"__**Objets :**__\n"
-        items_tried = []
-        for i in range(1,7):
-            for item in player.items:
-                iteme=global_functions.Items("pomme",id=item['id'])
-                iteme.is_item(x=6)
-                if iteme.stars==i:
-                    items_tried.append(item)
-        for item in items_tried:
-            iteme=global_functions.Items("pomme",id=item['id'])
-            iteme.is_item(x=6)
-            stars = "".join([":star:" for i in range(iteme.stars)])
-            text+=f"{stars} - **{iteme.name} (x{item['nb']}) **\n"
-        if not text:
-            text="malheureusement vous ne possédez aucun item, n'hésitez pas à faire des tirages pour en avoir "
+        player_items = dtb_funcs.get_player_items(player_id=player.id)
+
+        if not player_items:
+            await interaction.edit_original_response(content="malheureusement vous ne possédez aucun item, n'hésitez pas à faire des tirages pour en avoir ")
+            return
+        
+        text+=f"**   {Datas.emogi_cristal} Ton inventaire : {Datas.emogi_cristal}**\n\n"
+        text+=f"__**Objets :**__\n"
+        
+        for i in range(7):
+            for player_item in player_items:
+                item=global_functions.Items("pomme",id=player_item[1])
+                item.is_item(by_name=False)
+                if item.stars==i:
+                    stars = "".join([":star:" for i in range(item.stars)])
+                    text+=f"{stars} - **{item.name} (x{player_item[3]}) **\n"
+
         await interaction.edit_original_response(content=text)
 
 
