@@ -111,14 +111,19 @@ class Player:
             return False
 
 
-    def add_items(self,items):
+    def add_items(self,items,tirage=False):
         """ajoute les items au joueur"""
         for item in items:
-            item_db = dtb_funcs.get_item(item_id=item["id"])
-            if item_db:
+            item_db = dtb_funcs.get_player_item(item_id=item["id"],player_id=self.id)
+            if item_db and tirage:
+                print("test")
+                dtb_funcs.edit_player_item(item_db[1],item_db[2],item_db[3]+item["nb"],True)
+            elif item_db:
+                print("test2")
                 dtb_funcs.edit_player_item(item_db[1],item_db[2],item_db[3]+item["nb"],item_db[4])
             else:
-                dtb_funcs.add_player_item(item["id"],self.id,item["nb"],False)
+                print("test3")
+                dtb_funcs.add_player_item(item["id"],self.id,item["nb"],tirage)
 
     def tirages(self,nb_tirage,tirage_4=False):
         all_items=[]
@@ -198,13 +203,13 @@ class Player:
                 if result:
                     new_item=Items(result['name'])
                     new_item.is_item()
-                    self.add_items([{"id":new_item.id,"nb":1}])
+                    self.add_items([{"id":new_item.id,"nb":1}],tirage=True)
                     all_items.append(new_item)
             #réduit de 1 la variable yato
             if self.yato_tirages>0:
                 self.yato_tirages-=1
                 
-        self.update_stats_player_fichier()
+        self.update_stats_player()
         return all_items
 
 class Items:
