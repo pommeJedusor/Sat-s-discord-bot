@@ -1,9 +1,10 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-import global_functions
 from datas.datas import Datas
 import json
+
+import global_functions, dtb_funcs
 
 class Gems(commands.Cog):
     def __init__(self,bot):
@@ -17,7 +18,7 @@ class Gems(commands.Cog):
             player = global_functions.Player(user.name,user.id)
             player.is_player()
             player.nb_gemmes+=nombre_de_gemmes
-            player.update_stats_player_fichier()
+            player.update_stats_player()
             await interaction.edit_original_response(content=f"les {nombre_de_gemmes} gemme(s) ont bien été ajoués à {user.name} ")
         elif nombre_de_gemmes==0:
             await interaction.edit_original_response(content="euh.... ???? vous êtes sûr??? bon ... bah ... c'est fait.. je suppose???")
@@ -46,7 +47,7 @@ class Gems(commands.Cog):
             player.nb_gemmes-=nombres_de_gemmes
             if depenser:
                 player.gemmes_spend+=nombres_de_gemmes
-            player.update_stats_player_fichier()
+            player.update_stats_player()
             await interaction.edit_original_response(content=f"les {nombres_de_gemmes} gemmes de {user.name} ont bien été dépensé qui a maintenant {player.nb_gemmes} gemmes ")
         elif not global_functions.bon_role(interaction.user):
             await interaction.edit_original_response(content="vous n'avez pas le bon role")
@@ -65,10 +66,10 @@ class Gems(commands.Cog):
         if global_functions.bon_role(interaction.user):
             await interaction.edit_original_response(content="voici la liste des joueurs et leurs nombres de gemmes")
             texts=[]
-            with open (Datas.player_file,"r") as f:
-                for line in f:
-                    line = json.loads(line)
-                    texts.append([line[0],line[2],f"{line[0]}: {line[2]} possédées {line[3]} dépensé"])
+
+            for player in dtb_funcs.get_players():
+                user = self.bot.get_user(player[0])
+                texts.append([user.name,player[1],f"{user.name}: {player[1]} possédées {player[2]} dépensé"])
 
             tri_lambda_gems = lambda x: x[1]
             tri_lambda_name = lambda x: x[0].lower()
