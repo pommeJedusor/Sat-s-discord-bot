@@ -72,19 +72,19 @@ class Tirage(commands.Cog):
             tirage_en_cours = True
             await interaction.edit_original_response(content=f"vous avez obtenus...")
 
-            for i in player.tirages(nombre_de_tirage):
-                if not type(i)==str:  
-                    i.is_item()
-                    await asyncio.sleep(i.stars)
+            for item in player.tirages(nombre_de_tirage):
+                if not type(item)==str:  
+                    item.is_item()
+                    await asyncio.sleep(item.stars)
                     if player.salon:
-                        await channel_perso.send(f"{i.name} : {i.stars} étoiles :")
+                        await channel_perso.send(f"{item.name} : {item.stars} étoiles :")
                     if not interaction.channel==channel_perso:
-                        await interaction.channel.send(f"{i.name} : {i.stars} étoiles :")
-                    if i.url_img:
+                        await interaction.channel.send(f"{item.name} : {item.stars} étoiles :")
+                    if item.url_img:
                         if player.salon:
-                            await channel_perso.send(f"{i.url_img}")
+                            await channel_perso.send(f"{item.url_img}")
                         if not interaction.channel==channel_perso:
-                            await interaction.channel.send(f"{i.url_img}")
+                            await interaction.channel.send(f"{item.url_img}")
                 else:
                     await asyncio.sleep(5)
                     await interaction.channel.send("vous avez gagné 2 cristaux d'expedition")
@@ -103,7 +103,7 @@ class Tirage(commands.Cog):
         await interaction.response.defer(ephemeral=True)
         player=global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
-        await interaction.edit_original_response(content=f"**Votre pity :star::star::star::star: : {player.pity[0]}/{player.pity[2]} **\n**Votre pity :star::star::star::star::star: : {player.pity[1]}/{player.pity[3]} **\n**Votre pity :star::star::star::star::star::star: : {player.pity[4]}/{player.pity[5]} **")
+        await interaction.edit_original_response(content=f"**Votre pity :star::star::star::star: : {player.pity[0]}/{player.pity[1]} **\n**Votre pity :star::star::star::star::star: : {player.pity[2]}/{player.pity[3]} **\n**Votre pity :star::star::star::star::star::star: : {player.pity[4]}/{player.pity[5]} **")
 
 async def setup(bot):
     await bot.add_cog(Tirage(bot))

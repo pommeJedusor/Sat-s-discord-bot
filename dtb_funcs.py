@@ -94,7 +94,7 @@ def add_player(player_id):
     con = sqlite3.connect(Datas.DATABASE)
     cur = con.cursor()
 
-    cur.execute("INSERT INTO `Players`(`player_id`) VALUES (?)", (player_id,))
+    cur.execute("INSERT INTO `Players`(`player_id`,`pity_den_4`,`pity_den_5`,`pity_den_6`) VALUES (?,?,?,?)", (player_id,10,50,80))
     con.commit()
 
     cur.close()
@@ -108,11 +108,24 @@ def get_player(player_id):
 
     cur.execute("SELECT * FROM `Players` WHERE `player_id`=?",(player_id,))
     player = cur.fetchone()
+    print(player)
 
     cur.close()
     con.close()
 
     return player
+
+def get_players():
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("SELECT * FROM `Players`")
+    players = cur.fetchall()
+
+    cur.close()
+    con.close()
+
+    return players
 
 def update_player(player_id, gems_numbers, gems_spent, channel_id, Yato_tirage_number, pity_den_4, pity_den_5, pity_den_6, pity_num_4, pity_num_5, pity_num_6, last_question_answerd, last_vote_message_id):
     if not get_player(player_id):

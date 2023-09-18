@@ -75,7 +75,7 @@ class Player:
 
     def update_stats_player(self):
         """actualise la base de données avec les données actuels de l'instance"""
-        return dtb_funcs.update_player(self.id, self.nb_gemmes, self.gemmes_spend, self.salon, self.yato_tirages, self.pity[PITYN4], self.pity[PITYD4], self.pity[PITYN5], self.pity[PITYD5], self.pity[PITYN6], self.pity[PITYD6],self.last_question_answerd,self.last_vote)
+        return dtb_funcs.update_player(self.id, self.nb_gemmes, self.gemmes_spend, self.salon, self.yato_tirages, self.pity[PITYD4], self.pity[PITYD5], self.pity[PITYD6], self.pity[PITYN4], self.pity[PITYN5], self.pity[PITYN6],self.last_question_answerd,self.last_vote)
     
     def is_player(self):
         """
@@ -177,28 +177,28 @@ class Player:
                     #ajuste la pity en fonction du résultat
                     #reset panda dès l'obtention d'une min 4 étoiles
                     if stars >= 4:
-                        self.pity[5]=80
-                        self.pity[3]=50
-                        self.pity[2]=10
+                        self.pity[PITYD6]=80
+                        self.pity[PITYD5]=50
+                        self.pity[PITYD4]=10
                     if stars == 6:
-                        self.pity[4]=0
-                        self.pity[0]+=1
-                        self.pity[1]+=1
+                        self.pity[PITYN6]=0
+                        self.pity[PITYN4]+=1
+                        self.pity[PITYN5]+=1
                         self.spend_gems(1)
                     elif stars == 5:
-                        self.pity[1]=0
-                        self.pity[4]+=1
-                        self.pity[0]+=1
+                        self.pity[PITYN5]=0
+                        self.pity[PITYN4]+=1
+                        self.pity[PITYN6]+=1
                         self.spend_gems(1)
                     elif stars== 4:
-                        self.pity[0]=0
-                        self.pity[4]+=1
-                        self.pity[1]+=1
+                        self.pity[PITYN4]=0
+                        self.pity[PITYN5]+=1
+                        self.pity[PITYN6]+=1
                         self.spend_gems(1)
                     elif stars:
-                        self.pity[0]+=1
-                        self.pity[1]+=1
-                        self.pity[4]+=1
+                        self.pity[PITYN4]+=1
+                        self.pity[PITYN5]+=1
+                        self.pity[PITYN6]+=1
                         self.spend_gems(1)
                 if result:
                     new_item=Items(result['name'])

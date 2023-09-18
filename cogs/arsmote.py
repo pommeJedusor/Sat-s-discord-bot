@@ -26,9 +26,12 @@ class Dropdown(discord.ui.Select):
         item.is_item(x=6)
         channel_perso=self.bot.get_channel(player.salon)
 
-        player.lose_item(item.id,1)
         text=""
         for i in player.tirages(1,tirage_4=True):
+            if i.stars != 4:
+                await interaction.response.send_message(f"pas de 4 étoiles disponible pour le moment veuiller réessayer plus tard")
+                return
+            player.lose_item(item.id,1)
             text+=f"{i.name}: {i.stars} étoiles \n"
         player.powers.append({"id": Datas.arsmote_id, "active": False})
         player.powers.remove({"id": Datas.arsmote_id, "active": True})
