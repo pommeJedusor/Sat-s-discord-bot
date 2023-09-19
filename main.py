@@ -33,17 +33,21 @@ async def on_ready():
     #check si y a des nouveaux votes
     vote_channel = bot.get_channel(Datas.hosts_id)
     host = dtb_funcs.get_host()
-    async for message in vote_channel.history(limit=5,oldest_first=False):
-        host_message = message
-        if host and host[1]==message.id:
+    host_message = None
+    before_host_message = None
+    async for message in vote_channel.history(limit=6,oldest_first=False):
+        if host and host_message and host[1]==host_message.id:
+            before_host_message = message
             break
+        before_host_message = message
+        host_message = message
 
     if not host:
         dtb_funcs.add_host(host_message.id)
     else:
         dtb_funcs.edit_host(host_message.id)
 
-    async for message in vote_channel.history(after=host_message,oldest_first=True):
+    async for message in vote_channel.history(after=before_host_message,oldest_first=True):
         for reaction in message.reactions:
             async for user in reaction.users():
                 if global_functions.votes(user,message):
