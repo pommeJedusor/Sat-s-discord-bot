@@ -23,7 +23,7 @@ class Gems(commands.Cog):
         elif nombre_de_gemmes==0:
             await interaction.edit_original_response(content="euh.... ???? vous êtes sûr??? bon ... bah ... c'est fait.. je suppose???")
         elif nombre_de_gemmes<0:
-            await interaction.edit_original_response(content="les nombres nuls ou négatifs ne sont pas accepter veuillez utiliser la commande '/destroy_gems' ou son homologue '\spend_gems'")
+            await interaction.edit_original_response(content="les nombres nuls ou négatifs ne sont pas accepter veuillez utiliser la commande '\spend_gems'")
         else:
             await interaction.edit_original_response(content="vous n'avez pas le bon rôle")
 
