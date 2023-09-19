@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-import json, random
 from typing import Optional
 
 import global_functions, dtb_funcs
@@ -16,9 +15,13 @@ class Items(commands.Cog):
     @app_commands.command(name="create_item",description="permet à un modo de creer un item")
     async def create_item(self,interaction:discord.Interaction,name:str,nombre_d_étoiles:int,indice_drop:int,img_link:str):
         await interaction.response.defer()
-        item=global_functions.Items(name,nombre_d_étoiles,indice_drop,img_link,id=random.randint(1,1000000000))
+        item=global_functions.Items(name,nombre_d_étoiles,indice_drop,img_link)
         if not item.is_item() and global_functions.bon_role(interaction.user):
-            if item.add_item():
+            if nombre_d_étoiles<1:
+                await interaction.edit_original_response(content="il est impossible de créer des items de moin d'une étoile")
+            elif indice_drop<0:
+                await interaction.edit_original_response(content="il est impossible de créer des items avec un indice de drop de moins de 0")
+            elif item.add_item():
                 await interaction.edit_original_response(content=f"l'item {name} {nombre_d_étoiles} étoiles avec un indice de drop {indice_drop} a bien été rajouté à la base de donnés")
             else:
                 await interaction.edit_original_response(content="l'ajout de l'item a échoué pour des raisons inconnus")
@@ -31,28 +34,31 @@ class Items(commands.Cog):
     async def edit_item(self,interaction:discord.Interaction,name:str,nombre_d_étoiles:Optional[int],indice_drop:Optional[int],image_link:Optional[str],effets:Optional[str],tirage_active:Optional[bool],new_name:Optional[str]):
         await interaction.response.defer()
         item=global_functions.Items(name)
-        if item.is_item() and global_functions.bon_role(interaction.user):
+        if item.is_item() and global_functions.bon_role(interaction.user) and (nombre_d_étoiles==None or nombre_d_étoiles>0) and (indice_drop==None or indice_drop>=0):
             item.name=name
             message=f"l'item {name} a bien été modifié, et à comme caractéristique:\n"
-            if new_name is not None:
+            if new_name:
                 new_item=global_functions.Items(new_name)
                 if not new_item.is_item():
                     item.name=new_name
                     message=f"l'item {name} ({new_name} maintenant) a bien été modifié, et à comme caractéristique:\n"
-            if nombre_d_étoiles is not None:
+                else:
+                    await interaction.edit_original_response(content=f"le nouveau nom de l'item {name} est déjà attribué à un item")
+                    return
+            if nombre_d_étoiles!=None:
                 item.stars=nombre_d_étoiles
                 message+=f"étoiles: {nombre_d_étoiles}\n"
-            if indice_drop is not None:
+            if indice_drop!=None:
                 item.drop=indice_drop
                 message+=f"indice de drop: {indice_drop}\n"
-            if image_link is not None:
+            if image_link:
                 item.url_img=image_link
                 message+=f"lien pour l'image: {image_link}\n"
-            if effets is not None:
+            if effets:
                 effets=effets.split(",")
                 item.effects=effets
                 message+=f"effets: {effets}\n"
-            if tirage_active is not None:
+            if tirage_active!=None:
                 item.on_tirage=tirage_active
                 if tirage_active:
                     message+=f"est dans les tirages: oui\n"
@@ -62,6 +68,10 @@ class Items(commands.Cog):
             await interaction.edit_original_response(content=message)
         elif not global_functions.bon_role(interaction.user):
             await interaction.edit_original_response(content=f"vous n'avez pas le bon rôle ")
+        elif (nombre_d_étoiles!=None and nombre_d_étoiles<1):
+            await interaction.edit_original_response(content="il est impossible d'avoir des items de moins d'une étoile")
+        elif (indice_drop!=None and indice_drop<0):
+            await interaction.edit_original_response(content="il est impossible d'avoir des items à l'indice de drop négatif")
         else:
             await interaction.edit_original_response(content=f"l'item {name} n'as pas été trouvé ")
     
