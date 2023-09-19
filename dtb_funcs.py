@@ -31,6 +31,18 @@ def get_items_ontirage():
 
     return items
 
+def get_items():
+    con = sqlite3.connect(Datas.DATABASE)
+    cur = con.cursor()
+
+    cur.execute("SELECT * FROM `Items`")
+    items = cur.fetchall()
+
+    cur.close()
+    con.close()
+
+    return items
+
 def get_item(item_name=False, item_id=False):
     #check if only one of the two have a value
     if (item_name and item_id) or (not item_name and not item_id):

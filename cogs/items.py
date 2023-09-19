@@ -5,7 +5,7 @@ from discord import app_commands
 import json, random
 from typing import Optional
 
-import global_functions
+import global_functions, dtb_funcs
 from datas.datas import Datas
 
 class Items(commands.Cog):
@@ -86,39 +86,40 @@ class Items(commands.Cog):
     async def see_all_items(self,interaction:discord.Interaction,stars:int=None,active:bool=None,drop:int=None, tri :app_commands.Choice[str]=None):
         await interaction.response.defer()
 
-        stars_filter = lambda ligne: stars==None or ligne[1]==stars
-        active_filter = lambda ligne: active==None or ligne[5]==active
-        drop_filter = lambda ligne: drop==None or ligne[2]==drop
+        stars_filter = lambda item_dtb: stars==None or item_dtb[2]==stars
+        active_filter = lambda item_dtb: active==None or item_dtb[5]==active
+        drop_filter = lambda item_dtb: drop==None or item_dtb[3]==drop
 
         items=[]
-        lignes=[]
-        with open(Datas.items_file,'r')as f:
-            for ligne in f:
-                ligne=json.loads(ligne)
-                lignes.append(ligne)
+        items_dtb = dtb_funcs.get_items()
 
-        lignes = list(filter(active_filter,lignes))
-        lignes = list(filter(stars_filter,lignes))
-        lignes = list(filter(drop_filter,lignes))
-        items_tried = lignes
+        items_dtb = list(filter(active_filter,items_dtb))
+        items_dtb = list(filter(stars_filter,items_dtb))
+        items_dtb = list(filter(drop_filter,items_dtb))
+
+        items_tried = items_dtb
+        #if tri==None or tri.value=="stars":
         if (tri and tri.value=="stars") or tri==None:
             items_tried = []
-            for i in range(1,7):
-                for ligne in lignes:
-                    if ligne[1]==i:
+            for nb_stars in range(1,7):
+                for ligne in items_dtb:
+                    if ligne[2]==nb_stars:
                         items_tried.append(ligne)
-        if tri and tri.value=="name":
-            items_tried = sorted(lignes)
-        lignes = items_tried
 
-        for ligne in lignes:
-            stars = "".join([":star:" for i in range(ligne[1])])
+        get_name = lambda item_dtb: item_dtb[1]
+        if tri and tri.value=="name":
+            items_tried = sorted(items_dtb,key=get_name)
+        items_dtb = items_tried
+
+        for ligne in items_dtb:
+            stars = "".join([":star:" for i in range(ligne[2])])
             if ligne[5]:
-                items.append(f"{stars} - **__{ligne[0]}__**  - Taux : {ligne[2]}  - Présent\n")
+                items.append(f"{stars} - **__{ligne[1]}__**  - Taux : {ligne[3]}  - Présent\n")
             else:
-                items.append(f"{stars} - **__{ligne[0]}__**  - Taux : {ligne[2]}  - Absent\n")
+                items.append(f"{stars} - **__{ligne[1]}__**  - Taux : {ligne[3]}  - Absent\n")
         await interaction.edit_original_response(content=f"**  {Datas.emogi_cristal}  Liste des objets:{Datas.emogi_cristal}**\n\n__**Objets :**__")
-        await interaction.channel.send("".join(items[:10]))
+        if items:
+            await interaction.channel.send("".join(items[:10]))
         for i in range(1,(len(items)-1)//10+1):
             await interaction.channel.send("".join(items[10*i:10*i+10]))
 
@@ -129,10 +130,10 @@ class Items(commands.Cog):
         item=global_functions.Items(name_item)
         if item.is_item() and item.url_img:
             await interaction.edit_original_response(content=item.url_img)
+        elif not item.is_item():
+            await interaction.edit_original_response(content=f"l'item {item.name} n'as pas été trouvé")
         elif not item.url_img:
-            await interaction.edit_original_response(content=f"l'item {item} n'as pas d'image ")
-        else:
-            await interaction.edit_original_response(content=f"l'item {item} n'as pas été trouvé")
+            await interaction.edit_original_response(content=f"l'item {item.name} n'as pas d'image ")
 
     
 
