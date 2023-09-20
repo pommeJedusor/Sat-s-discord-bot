@@ -77,9 +77,6 @@ class ItemsOwned(commands.Cog):
     
     @app_commands.command(name="see_effects_of_a_player",description="permet de voir les effets d'un joueur")
     async def see_effects_of_a_player(self,interaction: discord.Interaction, user:discord.Member):
-        """
-        not done for now
-        """
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user):
             player=global_functions.Player(user.name,user.id)
@@ -101,9 +98,6 @@ class ItemsOwned(commands.Cog):
     #players
     @app_commands.command(name="see_effects",description="permet de voir ses effets")
     async def see_effects(self,interaction: discord.Interaction):
-        """
-        not done for now
-        """
         await interaction.response.defer()
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
