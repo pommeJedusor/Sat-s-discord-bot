@@ -66,12 +66,12 @@
 |voir_les_questions|permet de regarder les questions déjà posé ainsi que leur nombres de votes(seules les modos peuvent voter)|
 |recompense_question|permet en spécifiant le numero de la question(voir dans "voir_les_questions") de supprimer la question de la base de donnée et de récompenser le joueur d'un nombre de gemmes de votre choix, réinitialise également les votes|
 |question_vote|permet de voter pour une des questions en spécifiant le numero de la question(voir dans "voir_les_questions")|
+|recompense_question_semaine|à utiliser après avoir poser la question, permet de changer les récompense de la question de la semaine actuelle|
+|oubli_question|dans le cas où la mention a été oublié puis ajouté par edit ou mis en dessous puis supprimé, si énième_message=1 prend le dernier message pour la question, si 2 l'avant dernier, etc|
 
 |autres||
 |---------|----------------|
 |help|permet d'accéder aux commandes|
-|recompense_question_semaine|à utiliser après avoir poser la question, permet de changer les récompense de la question de la semaine actuelle !attention effet retrospectif donc si quelqu'un a déja répondus les gemmes reçus changeront en bien ou en mal|
-|oubli_question|dans le cas où la mention a été oublié puis ajouté par edit ou mis en dessous puis supprimé, si énième_message=1 prend le dernier message pour la question, si 2 l'avant dernier, etc|
 
 
 ## précision

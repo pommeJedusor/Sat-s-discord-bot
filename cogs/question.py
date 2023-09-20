@@ -2,13 +2,10 @@ from discord import app_commands
 from discord.ext import commands
 import discord
 import datetime
-
-import global_functions
 import json
 
 from datas.datas import Datas
-
-import random
+import global_functions, dtb_funcs
 
 PROPOSITON_QUESTION_FILE = "datas/datas_propositions_questions.txt"
 
@@ -20,31 +17,13 @@ class Question(commands.Cog):
     @app_commands.command(name="recompense_question_semaine", description="choisir le nombre de gemmes de récompense par défaut 2")
     async def reward_question_semaine(self,interaction:discord.Interaction,gemmes:int):
         await interaction.response.defer()
-        #check si modo
-        if not global_functions.bon_role(interaction.user):
+        if global_functions.bon_role(interaction.user) and dtb_funcs.edit_question(gemmes):
+            await interaction.edit_original_response(content=f"la récompense est désormais de {gemmes}")
+        elif not global_functions.bon_role(interaction.user):
             await interaction.edit_original_response(content=f"vous n'avez pas le bon rôle")
-            return 0
-        
-        with open(Datas.question_file,"r") as f:
-            ligne = f.readline()
-            if ligne:
-                line=json.loads(ligne)
-            else:
-                line = {"nb_gemmes": 0, "id_users": [], "starttime": 0, "message_id": 0}
-        dif_gems = gemmes - line["nb_gemmes"]
-        line["nb_gemmes"] = gemmes
-        with open(Datas.question_file, "w") as f:
-            f.write(json.dumps(line))
-
-        #fonctionnemnt rétroactif
-        for id_user in line["id_users"]:
-            user = self.bot.get_user(id_user)
-            player = global_functions.Player(user.name,user.id)
-            player.is_player()
-            player.nb_gemmes+=dif_gems
-            player.update_stats_player_fichier()
-
-        await interaction.edit_original_response(content=f"la récompense est désormais de {gemmes}")
+        else:
+            await interaction.edit_original_response(content=f"erreur local")
+            
 
     @app_commands.command(name="oubli_question", description="si mention ajouté à la queston de la semaine par edit")
     async def oubli_question(self,interaction:discord.Interaction,gemmes:int,énième_message:int=None,message_id:str=None):
@@ -60,9 +39,6 @@ class Question(commands.Cog):
         if not global_functions.bon_role(interaction.user):
             await interaction.edit_original_response(content=f"vous n'avez pas le bon rôle")
             return 0
-        elif (énième_message and message_id):
-            await interaction.edit_original_response(content=f"vous ne pouvez pas choisir 'énèime message' et 'message id' en même temps")
-            return 0
         elif not (énième_message or message_id):
             await interaction.edit_original_response(content=f"vous devez choisir 'énième message' 'ou message_id'")
             return 0
@@ -75,10 +51,8 @@ class Question(commands.Cog):
             async for message in channel_question.history(oldest_first=False,limit=énième_message):
                 right_message = message
         if right_message:
-            args={"nb_gemmes":gemmes,"id_users":[],"starttime":datetime.datetime.timestamp(right_message.created_at),"message_id":right_message.id}
-            with open(Datas.question_file,'w') as f:
-                f.write(json.dumps(args))
-            await interaction.edit_original_response(content=f"la question de {right_message.author} a été posée avec succès\nl'id: {right_message.id}\n<@718805832652816486> faut redémarrer le bot")
+            dtb_funcs.add_question(right_message.id, 2)
+            await interaction.edit_original_response(content=f"la question de {right_message.author} a été posée avec succès\nl'id: {right_message.id}")
         else:
             await interaction.edit_original_response(content=f"le message n'as pas été trouvé")
 
