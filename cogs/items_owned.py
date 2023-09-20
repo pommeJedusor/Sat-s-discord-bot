@@ -85,15 +85,12 @@ class ItemsOwned(commands.Cog):
             player=global_functions.Player(user.name,user.id)
             player.is_player()
             text=""
-            for i in player.items:
-                item=global_functions.Items("pomme",id=i['id'])
-                if item.is_item(x=6) and item.effects:
-                    effet=""
-                    if i['nb']>=len(item.effects):
-                        effet=item.effects[-1]
-                    else:
-                        effet=item.effects[i['nb']]
-                    text+=f"l'item {item.name} lui octroy l'effet: {effet} \n"
+            for player_item in dtb_funcs.get_player_items(player_id=player.id):
+                item=global_functions.Items("pomme",id=player_item[1])
+                if item.is_item(by_name=False):
+                    for effect in dtb_funcs.get_effects(item_id=item.id,nb_items=player_item[3]):
+                        text+=f"l'item {item.name} lui octroy l'effect: {effect[1]} \n"
+
             if text !="":
                 await interaction.edit_original_response(content=text)
             else:
@@ -111,19 +108,16 @@ class ItemsOwned(commands.Cog):
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         text=""
-        for i in player.items:
-            item=global_functions.Items("pomme",id=i['id'])
-            if item.is_item(x=6) and item.effects:
-                effet=""
-                if i['nb']>=len(item.effects):
-                    effet=item.effects[-1]
-                else:
-                    effet=item.effects[i['nb']-1]
-                text+=f"l'item {item.name} vous octroy l'effet: {effet} \n"
+        for player_item in dtb_funcs.get_player_items(player_id=player.id):
+                item=global_functions.Items("pomme",id=player_item[1])
+                if item.is_item(by_name=False):
+                    for effect in dtb_funcs.get_effects(item_id=item.id,nb_items=player_item[3]):
+                        text+=f"l'item {item.name} vous octroy l'effect: {effect[1]} \n"
+
         if text !="":
             await interaction.edit_original_response(content=text)
         else:
-            await interaction.response.send_message(f":x: **Vous n'avez aucun effet.** :x:")
+            await interaction.edit_original_response(content=f":x: **Vous n'avez aucun effet.** :x:")
     
     @app_commands.command(name="see_items",description="permet de voir ses items")
     async def see_items(self,interaction:discord.Interaction):
