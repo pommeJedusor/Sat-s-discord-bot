@@ -31,7 +31,7 @@ class Items(commands.Cog):
             await interaction.edit_original_response(content=f"l'item {name} existe déja")
 
     @app_commands.command(name="edit_item",description="permet à un modo de modifier un item")
-    async def edit_item(self,interaction:discord.Interaction,name:str,nombre_d_étoiles:Optional[int],indice_drop:Optional[int],image_link:Optional[str],effets:Optional[str],tirage_active:Optional[bool],new_name:Optional[str]):
+    async def edit_item(self,interaction:discord.Interaction,name:str,nombre_d_étoiles:Optional[int],indice_drop:Optional[int],image_link:Optional[str],effects:Optional[str],tirage_active:Optional[bool],new_name:Optional[str]):
         await interaction.response.defer()
         item=global_functions.Items(name)
         if item.is_item() and global_functions.bon_role(interaction.user) and (nombre_d_étoiles==None or nombre_d_étoiles>0) and (indice_drop==None or indice_drop>=0):
@@ -54,10 +54,13 @@ class Items(commands.Cog):
             if image_link:
                 item.url_img=image_link
                 message+=f"lien pour l'image: {image_link}\n"
-            if effets:
-                effets=effets.split(",")
-                item.effects=effets
-                message+=f"effets: {effets}\n"
+            if effects:
+                for db_effect in dtb_funcs.get_effects(item_id=item.id):
+                    dtb_funcs.delete_effect(db_effect[0])
+                effects=effects.split(",")
+                for effect_nb in range(len(effects)):
+                    dtb_funcs.add_effect(effects[effect_nb],effect_nb+1,item.id)
+                message+=f"effects: {effects}\n"
             if tirage_active!=None:
                 item.on_tirage=tirage_active
                 if tirage_active:
