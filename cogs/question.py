@@ -11,6 +11,7 @@ from datas.datas import Datas
 import random
 
 PROPOSITON_QUESTION_FILE = "datas/datas_propositions_questions.txt"
+PAST_PROPOSITON_QUESTION_FILE = "datas/datas_past_propositions_questions.txt"
 
 BOT = None
 
@@ -132,6 +133,9 @@ class Question(commands.Cog):
             if final_line:
                 with open(PROPOSITON_QUESTION_FILE,"w") as f:
                     f.write(text)
+                with open(PAST_PROPOSITON_QUESTION_FILE,"a") as f:
+                    f.write(json.dumps(line)+"\n")
+
                 player = global_functions.Player("pomme",final_line[0])
                 player.is_player()
                 player.nb_gemmes+=gems_number_reward
