@@ -12,6 +12,8 @@ import random
 
 PROPOSITON_QUESTION_FILE = "datas/datas_propositions_questions.txt"
 
+BOT = None
+
 class Question(commands.Cog):
     def __init__(self, bot):
         self.bot = bot 
@@ -147,6 +149,7 @@ class Question(commands.Cog):
 
     @app_commands.command(name="voir_les_questions", description="permet de voir les question proposé par les joueurs")
     async def voir_les_questions(self,interaction:discord.Interaction):
+        global BOT
         await interaction.response.defer()
         data = []
 
@@ -154,7 +157,9 @@ class Question(commands.Cog):
             compteur = 1
             for line in f:
                 line = json.loads(line)
-                data.append({"number":f"{compteur})","question":line[1],"votes":line[2]})
+                user = await BOT.fetch_user(line[0])
+                username = user.name
+                data.append({"number":f"{compteur})","question":line[1],"votes":line[2],"user":username})
                 compteur+=1
 
         pagination_view = PaginationView(timeout=None)
@@ -183,7 +188,7 @@ class PaginationView(discord.ui.View):
     def create_embed(self, data):
         embed = discord.Embed(title=f"liste des questions {self.current_page} / {int(len(self.data) / self.sep) + 1}:")
         for item in data:
-            embed.add_field(name=item['number'], value=f"{item['question']}\nvotes: {item['votes']}", inline=False)
+            embed.add_field(name=item['number'], value=f"{item['question']}\nvotes: {item['votes']}\nuser: {item['user']}", inline=False)
         return embed
 
     async def update_message(self,interaction: discord.Interaction,data):
@@ -249,4 +254,6 @@ class PaginationView(discord.ui.View):
         await self.update_message(interaction, self.get_current_page_data())
 
 async def setup(bot):
+    global BOT
+    BOT = bot
     await bot.add_cog(Question(bot))
