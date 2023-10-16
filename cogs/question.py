@@ -169,6 +169,25 @@ class Question(commands.Cog):
         pagination_view = PaginationView(timeout=None)
         pagination_view.data = data
         await pagination_view.send(interaction)
+
+    @app_commands.command(name="voir_les_questions_supprimées", description="permet de voir les question proposé supprimées")
+    async def voir_les_questions_supprimer(self,interaction:discord.Interaction):
+        global BOT
+        await interaction.response.defer()
+        data = []
+
+        with open(PAST_PROPOSITON_QUESTION_FILE, 'r') as f:
+            compteur = 1
+            for line in f:
+                line = json.loads(line)
+                user = await BOT.fetch_user(line[0])
+                username = user.name
+                data.append({"number":f"{compteur})","question":line[1],"votes":line[2],"user":username})
+                compteur+=1
+
+        pagination_view = PaginationView(timeout=None)
+        pagination_view.data = data
+        await pagination_view.send(interaction)
             
 class QuestionModal(discord.ui.Modal, title="proposition_question"):
     proposition_question = discord.ui.TextInput(label="proposition_question",style=discord.TextStyle.paragraph)
