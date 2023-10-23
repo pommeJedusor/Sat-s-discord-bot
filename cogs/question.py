@@ -88,7 +88,7 @@ class Question(commands.Cog):
     @app_commands.command(name="question_vote", description="permet de voter pour une proposition de question")
     async def question_vote(self,interaction:discord.Interaction,question_number: int):
         await interaction.response.defer(ephemeral=True)
-        if global_functions.bon_role(interaction.user):
+        if global_functions.bon_role(interaction.user, animateur=True):
             with open(PROPOSITON_QUESTION_FILE,"r") as f:
                 compteur = 1
                 text=""
