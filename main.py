@@ -95,7 +95,34 @@ async def on_message(message):
             bot_channel = bot.get_channel(Datas.channel_message_bot)
             await bot_channel.send(f"{message.author.name} a répondu à la question de la semaine et a gagné {line['nb_gemmes']} cristaux")
 
+    #review events
+    if message.channel.id == Datas.channel_review_events and not message.author.bot:
+        with open(Datas.review_events_file,"r") as f:
+            ligne = f.readline()
+            if ligne:
+                line=json.loads(ligne)
+            else:
+                line = {"nb_gemmes": 0, "id_users": [], "starttime": 0, "message_id": 0}
 
+        if datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("<@&1168659568138657923>")>=0 and global_functions.bon_role(message.author):
+            #si y a le @Prochain Host dans le message et bon_role
+            args={"nb_gemmes":2,"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
+            with open(Datas.review_events_file,'w') as f:
+                f.write(json.dumps(args))
+            parameter_channel = bot.get_channel(Datas.channel_message_bot)
+            await parameter_channel.send(f"les reviews events ont été lancé avec succès")
+
+        elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("<@&1168659568138657923>")==-1 and not line["id_users"]==False and not message.author.id in line['id_users']: 
+            #si un joueur fournit une review de l'event
+            player=global_functions.Player(message.author.name,message.author.id)
+            player.is_player()
+            player.nb_gemmes+=line['nb_gemmes']
+            line['id_users'].append(message.author.id)
+            with open(Datas.review_events_file,"w") as f:
+                f.write(json.dumps(line))
+            player.update_stats_player_fichier()
+            bot_channel = bot.get_channel(Datas.channel_message_bot)
+            await bot_channel.send(f"{message.author.name} a fournit une reveiw de l'event et a gagné {line['nb_gemmes']} cristaux")
 
 
 bot.run(Datas.bot_token)
