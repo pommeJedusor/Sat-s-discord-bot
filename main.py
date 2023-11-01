@@ -125,7 +125,7 @@ async def on_message(message):
 
         if datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("<@&1159869065934934076>")>=0 and global_functions.bon_role(message.author):
             #si y a le @Prochain Host dans le message et bon_role
-            args={"nb_gemmes":2,"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
+            args={"nb_gemmes":1,"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
             with open(Datas.review_events_file,'w') as f:
                 f.write(json.dumps(args))
             parameter_channel = bot.get_channel(Datas.channel_message_bot)
