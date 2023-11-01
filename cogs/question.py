@@ -20,15 +20,24 @@ class Question(commands.Cog):
         self.bot = bot 
 
     #modos
+    @app_commands.choices(questions=[
+    app_commands.Choice(name="questions", value=1),
+    app_commands.Choice(name="review-events", value=0),
+    ])
     @app_commands.command(name="recompense_question_semaine", description="choisir le nombre de gemmes de récompense par défaut 2")
-    async def reward_question_semaine(self,interaction:discord.Interaction,gemmes:int):
+    async def reward_question_semaine(self,interaction:discord.Interaction,gemmes:int, questions:app_commands.Choice[int]=None):
         await interaction.response.defer()
         #check si modo
         if not global_functions.bon_role(interaction.user):
             await interaction.edit_original_response(content=f"vous n'avez pas le bon rôle")
             return 0
         
-        with open(Datas.question_file,"r") as f:
+        print(questions)
+        if not questions or questions.value:
+            file = Datas.question_file
+        else:
+            file = Datas.review_events_file
+        with open(file,"r") as f:
             ligne = f.readline()
             if ligne:
                 line=json.loads(ligne)
@@ -36,7 +45,7 @@ class Question(commands.Cog):
                 line = {"nb_gemmes": 0, "id_users": [], "starttime": 0, "message_id": 0}
         dif_gems = gemmes - line["nb_gemmes"]
         line["nb_gemmes"] = gemmes
-        with open(Datas.question_file, "w") as f:
+        with open(file, "w") as f:
             f.write(json.dumps(line))
 
         #fonctionnemnt rétroactif
@@ -49,8 +58,18 @@ class Question(commands.Cog):
 
         await interaction.edit_original_response(content=f"la récompense est désormais de {gemmes}")
 
+    @app_commands.choices(questions=[
+    app_commands.Choice(name="questions", value=1),
+    app_commands.Choice(name="review-events", value=0),
+    ])
     @app_commands.command(name="oubli_question", description="si mention ajouté à la queston de la semaine par edit")
-    async def oubli_question(self,interaction:discord.Interaction,gemmes:int,énième_message:int=None,message_id:str=None):
+    async def oubli_question(self,interaction:discord.Interaction,gemmes:int,énième_message:int=None,message_id:str=None, questions:app_commands.Choice[int]=None):
+        if not questions or questions.value:
+            channel=self.bot.get_channel(Datas.channel_question)
+            file = Datas.question_file
+        else:
+            channel=self.bot.get_channel(Datas.channel_review_events)
+            file = Datas.review_events_file
         await interaction.response.defer(ephemeral=True)
         try:
             if message_id:
@@ -59,7 +78,6 @@ class Question(commands.Cog):
             await interaction.edit_original_response(content=f"entrez un nombre valide")
             return 0
         right_message = None
-        channel_question=self.bot.get_channel(Datas.channel_question)
         if not global_functions.bon_role(interaction.user):
             await interaction.edit_original_response(content=f"vous n'avez pas le bon rôle")
             return 0
@@ -70,18 +88,21 @@ class Question(commands.Cog):
             await interaction.edit_original_response(content=f"vous devez choisir 'énième message' 'ou message_id'")
             return 0
         elif message_id:
-            async for message in channel_question.history(oldest_first=False):
+            async for message in channel.history(oldest_first=False):
                 if message.id==message_id:
                     right_message = message
                     break
         elif énième_message:
-            async for message in channel_question.history(oldest_first=False,limit=énième_message):
+            async for message in channel.history(oldest_first=False,limit=énième_message):
                 right_message = message
         if right_message:
             args={"nb_gemmes":gemmes,"id_users":[],"starttime":datetime.datetime.timestamp(right_message.created_at),"message_id":right_message.id}
-            with open(Datas.question_file,'w') as f:
+            with open(file,'w') as f:
                 f.write(json.dumps(args))
-            await interaction.edit_original_response(content=f"la question de {right_message.author} a été posée avec succès\nl'id: {right_message.id}\n<@718805832652816486> faut redémarrer le bot")
+            if questions:
+                await interaction.edit_original_response(content=f"la question de {right_message.author} a été posée avec succès\nl'id: {right_message.id}\n<@718805832652816486> faut redémarrer le bot")
+            else:
+                await interaction.edit_original_response(content=f"les reviews events ont été lancé par {right_message.author} avec succès\nl'id: {right_message.id}\n<@718805832652816486> faut redémarrer le bot")
         else:
             await interaction.edit_original_response(content=f"le message n'as pas été trouvé")
 
