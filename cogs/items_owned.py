@@ -124,7 +124,7 @@ class ItemsOwned(commands.Cog):
         if text !="":
             await interaction.edit_original_response(content=text)
         else:
-            await interaction.response.send_message(f":x: **Vous n'avez aucun effet.** :x:")
+            await interaction.edit_original_response(content=f":x: **Vous n'avez aucun effet.** :x:")
     
     @app_commands.command(name="see_items",description="permet de voir ses items")
     async def see_items(self,interaction:discord.Interaction):
