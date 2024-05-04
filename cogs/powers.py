@@ -52,11 +52,12 @@ class Powers(commands.Cog):
         if {"id":Datas.panda_id,"active":True} in player.caracter[8]:
             player.caracter[6][2]=9
             player.caracter[6][3]=45
+            player.caracter[6][5]=72
             for power in player.caracter[8]:
                 if power['id']==Datas.panda_id:
                     power['active']=False
             player.update_stats_player_fichier()
-            await interaction.response.send_message(f"votre pouvoir a bien été utilisé votre pity est désormais de : \n {player.caracter[6][0]}/{player.caracter[6][2]} pour les 4 étoiles \n {player.caracter[6][1]}/{player.caracter[6][3]} pour les 5 étoiles")
+            await interaction.response.send_message(f"votre pouvoir a bien été utilisé votre pity est désormais de : \n {player.caracter[6][0]}/{player.caracter[6][2]} pour les 4 étoiles \n {player.caracter[6][1]}/{player.caracter[6][3]} pour les 5 étoiles\n{player.caracter[6][4]}/{player.caracter[6][5]} pour les 6 étoiles")
         elif {"id":Datas.panda_id,"active":False} in player.caracter[8]:
             await interaction.response.send_message("votre pouvoir est désactivé")
         else:
