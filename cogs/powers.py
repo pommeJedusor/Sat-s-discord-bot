@@ -23,7 +23,7 @@ class Powers(commands.Cog):
                     text+=json.dumps(ligne)+"\n"
             with open(Datas.player_file,"w") as f:
                 f.write(text)
-            await interaction.response.send_message("l'opération a réussis ")
+            await interaction.response.send_message(":white_check_mark: **Le pouvoir a bien été réinitialisé.** :white_check_mark:")
         else:
             await interaction.response.send_message("vous n'avez pas le bon role")
     
@@ -39,8 +39,10 @@ class Powers(commands.Cog):
             await interaction.response.send_message("activé")
         elif  player.caracter[10]>0:
             await interaction.response.send_message(f"il vous reste {player.caracter[10]} tirages où le pouvoir peut prendre effets")
+        elif {"id":Datas.Yato_id,"active":False} in player.caracter[8]:
+            await interaction.response.send_message(f"votre pouvoir est désactivé")
         else:
-            await interaction.response.send_message("pouvoir désactivé")
+            await interaction.response.send_message(":x: **Vous n'avez pas l'objet requis pour effectuer cette commande.** :x:")
         player.update_stats_player_fichier()
     
     @app_commands.command(name="panda",description=r"utilise la capacité de panda et réduit de 10% la pity a avoir")
@@ -58,7 +60,7 @@ class Powers(commands.Cog):
         elif {"id":Datas.panda_id,"active":False} in player.caracter[8]:
             await interaction.response.send_message("votre pouvoir est désactivé")
         else:
-            await interaction.response.send_message("vous n'avez pas l'item requis pour effectuer cette commande")
+            await interaction.response.send_message(":x: **Vous n'avez pas l'objet requis pour effectuer cette commande.** :x:")
 
 
 async def setup(bot):
