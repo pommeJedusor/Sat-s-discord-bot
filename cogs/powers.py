@@ -11,6 +11,7 @@ class Powers(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    #modo
     @app_commands.command(name="reset_power",description="permet de réactivé les effets des persos panda et arsmote")
     async def reset_power(self,interaction: discord.Interaction):
         await interaction.response.defer()
@@ -28,6 +29,7 @@ class Powers(commands.Cog):
         else:
             await interaction.edit_original_response(content="vous n'avez pas le bon role")
     
+    #players
     @app_commands.command(name="yato",description=r"20% de chances d'obtenir 2 cristaux durant 10 tirages l'reste=items")
     async def yato(self,interaction: discord.Interaction):
         await interaction.response.defer()

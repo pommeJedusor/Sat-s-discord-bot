@@ -13,6 +13,54 @@ class Tirage(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
 
+    #modo
+    @app_commands.command(name="change_channel",description="permet de changer ou d'initialiser le channel d'un joueur")
+    async def change_channel(self,interaction:discord.Interaction,user:discord.Member):
+        await interaction.response.defer()
+        player = global_functions.Player(user.name,user.id)
+        player.is_player()
+        if global_functions.bon_role(interaction.user):
+            player.caracter[5]=interaction.channel_id
+            player.update_stats_player_fichier()
+            await interaction.edit_original_response(content=f"{Datas.emogi_cristal}** Le Salon perso de __{user}__ est désormais __{interaction.channel.name}__. ** {Datas.emogi_cristal}")
+        else:
+            await interaction.edit_original_response(content="vous n'avez pas le bon role")
+
+    @app_commands.command(name="see_pity_of_a_player",description="permet de voir la pity d'un joueur")
+    async def see_pity_of_a_player(self,interaction:discord.Interaction,user:discord.Member):
+        await interaction.response.defer()
+        if global_functions.bon_role(interaction.user):
+            player=global_functions.Player(user.name,user.id)
+            player.is_player()
+            await interaction.edit_original_response(content=f"pour l'obtention d'une 4 étoiles: {player.caracter[6][0]}/{player.caracter[6][2]} \n pour l'obtention d'une 5 étoiles: {player.caracter[6][1]}/{player.caracter[6][3]}\n pour l'obtention d'une 6 étoiles: {player.caracter[6][4]}/{player.caracter[6][5]}")
+        else:
+            await interaction.edit_original_response(content="vous n'avez pas le bon role")
+
+    @app_commands.command(name="edit_pity_of_a_player",description="permet de modifier la pity d'un joueur")
+    async def edit_pity_of_a_player(self,interaction:discord.Interaction,user:discord.Member,dénominateur_4:int=False,dénominateur_5:int=False,numérateur_4:int=False,numérateur_5:int=False,dénominateur_6:int=False,numérateur_6:int=False):
+        if global_functions.bon_role(interaction.user):
+            await interaction.response.defer()
+            player = global_functions.Player(user.name,user.id)
+            player.is_player()
+            if not numérateur_5:
+                numérateur_5=player.caracter[6][1]
+            if not numérateur_4:
+                numérateur_4=player.caracter[6][0]
+            if not dénominateur_4:
+                dénominateur_4=player.caracter[6][2]
+            if not dénominateur_5:
+                dénominateur_5=player.caracter[6][3]
+            if not numérateur_6:
+                numérateur_6=player.caracter[6][4]
+            if not dénominateur_6:
+                dénominateur_6=player.caracter[6][5]
+            player.caracter[6] = [numérateur_4,numérateur_5,dénominateur_4,dénominateur_5,numérateur_6,dénominateur_6]
+            player.update_stats_player_fichier()
+            await interaction.edit_original_response(content=f"le joueur {user.name} a désormais comme pity: \npour 4 étoiles: {player.caracter[6][0]}/{player .caracter[6][2]} \npour 5 étoiles {player.caracter[6][1]}/{player .caracter[6][3]} \net pour 6 étoiles: {player.caracter[6][4]}/{player .caracter[6][5]} ")
+        else:
+             await interaction.edit_original_response(content="vous n'avez pas le bon role")   
+
+    #players
     @app_commands.command(name="tirage",description="permet de faire des tirages")
     async def tirages(self,interaction:discord.Interaction,nombre_de_tirage:int):
         global tirage_en_cours
@@ -73,58 +121,12 @@ class Tirage(commands.Cog):
         else:
             await interaction.edit_original_response(content=f"il vous manque {nombre_de_tirage-player.caracter[2]} gemmes")
 
-    @app_commands.command(name="change_channel",description="permet de changer ou d'initialiser le channel d'un joueur")
-    async def change_channel(self,interaction:discord.Interaction,user:discord.Member):
-        await interaction.response.defer()
-        player = global_functions.Player(user.name,user.id)
-        player.is_player()
-        if global_functions.bon_role(interaction.user):
-            player.caracter[5]=interaction.channel_id
-            player.update_stats_player_fichier()
-            await interaction.edit_original_response(content=f"{Datas.emogi_cristal}** Le Salon perso de __{user}__ est désormais __{interaction.channel.name}__. ** {Datas.emogi_cristal}")
-        else:
-            await interaction.edit_original_response(content="vous n'avez pas le bon role")
-
     @app_commands.command(name="see_pity",description="permet de voir sa pity")
     async def voir_sa_pity(self,interaction:discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         player=global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         await interaction.edit_original_response(content=f"**Votre pity :star::star::star::star: : {player.caracter[6][0]}/{player.caracter[6][2]} **\n**Votre pity :star::star::star::star::star: : {player.caracter[6][1]}/{player.caracter[6][3]} **\n**Votre pity :star::star::star::star::star::star: : {player.caracter[6][4]}/{player.caracter[6][5]} **")
-
-    @app_commands.command(name="see_pity_of_a_player",description="permet de voir la pity d'un joueur")
-    async def see_pity_of_a_player(self,interaction:discord.Interaction,user:discord.Member):
-        await interaction.response.defer()
-        if global_functions.bon_role(interaction.user):
-            player=global_functions.Player(user.name,user.id)
-            player.is_player()
-            await interaction.edit_original_response(content=f"pour l'obtention d'une 4 étoiles: {player.caracter[6][0]}/{player.caracter[6][2]} \n pour l'obtention d'une 5 étoiles: {player.caracter[6][1]}/{player.caracter[6][3]}\n pour l'obtention d'une 6 étoiles: {player.caracter[6][4]}/{player.caracter[6][5]}")
-        else:
-            await interaction.edit_original_response(content="vous n'avez pas le bon role")
-
-    @app_commands.command(name="edit_pity_of_a_player",description="permet de modifier la pity d'un joueur")
-    async def edit_pity_of_a_player(self,interaction:discord.Interaction,user:discord.Member,dénominateur_4:int=False,dénominateur_5:int=False,numérateur_4:int=False,numérateur_5:int=False,dénominateur_6:int=False,numérateur_6:int=False):
-        if global_functions.bon_role(interaction.user):
-            await interaction.response.defer()
-            player = global_functions.Player(user.name,user.id)
-            player.is_player()
-            if not numérateur_5:
-                numérateur_5=player.caracter[6][1]
-            if not numérateur_4:
-                numérateur_4=player.caracter[6][0]
-            if not dénominateur_4:
-                dénominateur_4=player.caracter[6][2]
-            if not dénominateur_5:
-                dénominateur_5=player.caracter[6][3]
-            if not numérateur_6:
-                numérateur_6=player.caracter[6][4]
-            if not dénominateur_6:
-                dénominateur_6=player.caracter[6][5]
-            player.caracter[6] = [numérateur_4,numérateur_5,dénominateur_4,dénominateur_5,numérateur_6,dénominateur_6]
-            player.update_stats_player_fichier()
-            await interaction.edit_original_response(content=f"le joueur {user.name} a désormais comme pity: \npour 4 étoiles: {player.caracter[6][0]}/{player .caracter[6][2]} \npour 5 étoiles {player.caracter[6][1]}/{player .caracter[6][3]} \net pour 6 étoiles: {player.caracter[6][4]}/{player .caracter[6][5]} ")
-        else:
-             await interaction.edit_original_response(content="vous n'avez pas le bon role")   
 
 async def setup(bot):
     await bot.add_cog(Tirage(bot))

@@ -9,6 +9,7 @@ class ItemsOwned(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
 
+    #modos
     @app_commands.command(name="add_item_to_a_player",description="permet à un modo d'ajouter un item à un joueur")
     async def add_item_to_a_player(self,interaction:discord.Interaction,user:discord.Member,name:str,nombre:int=1):
         await interaction.response.defer()
@@ -55,31 +56,6 @@ class ItemsOwned(commands.Cog):
         else:
             await interaction.edit_original_response(content=f"vous n'avez pas le bon role")
 
-    @app_commands.command(name="see_items",description="permet de voir ses items")
-    async def see_items(self,interaction:discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
-        player = global_functions.Player(interaction.user.name,interaction.user.id)
-        player.is_player()
-        text=""
-        if player.caracter[4]:
-            text+=f"**   {Datas.emogi_cristal} Ton inventaire : {Datas.emogi_cristal}**\n\n"
-            text+=f"__**Objets :**__\n"
-        items_tried = []
-        for i in range(1,7):
-            for item in player.caracter[4]:
-                iteme=global_functions.Items("pomme",id=item['id'])
-                iteme.is_item(x=6)
-                if iteme.caracter[1]==i:
-                    items_tried.append(item)
-        for item in items_tried:
-            iteme=global_functions.Items("pomme",id=item['id'])
-            iteme.is_item(x=6)
-            stars = "".join([":star:" for i in range(iteme.caracter[1])])
-            text+=f"{stars} - **{iteme.caracter[0]} (x{item['nb']}) **\n"
-        if not text:
-            text="malheureusement vous ne possédez aucun item, n'hésitez pas à faire des tirages pour en avoir "
-        await interaction.edit_original_response(content=text)
-
     @app_commands.command(name="see_items_of_a_player",description="permet à un modo de voir les items d'un joueur")
     async def see_items_of_a_player(self,interaction:discord.Interaction, user:discord.Member):
         await interaction.response.defer()
@@ -105,27 +81,7 @@ class ItemsOwned(commands.Cog):
                 await interaction.edit_original_response(content="ce joueur n'as pas d'items")
         else:
             await interaction.edit_original_response(content="vous n'avez pas le bon role")
-
-    @app_commands.command(name="see_effects",description="permet de voir ses effets")
-    async def see_effects(self,interaction: discord.Interaction):
-        await interaction.response.defer()
-        player = global_functions.Player(interaction.user.name,interaction.user.id)
-        player.is_player()
-        text=""
-        for i in player.caracter[4]:
-            item=global_functions.Items("pomme",id=i['id'])
-            if item.is_item(x=6) and item.caracter[4]:
-                effet=""
-                if i['nb']>=len(item.caracter[4]):
-                    effet=item.caracter[4][-1]
-                else:
-                    effet=item.caracter[4][i['nb']-1]
-                text+=f"l'item {item.caracter[0]} vous octroy l'effet: {effet} \n"
-        if text !="":
-            await interaction.edit_original_response(content=text)
-        else:
-            await interaction.response.send_message(f":x: **Vous n'avez aucun effet.** :x:")
-
+    
     @app_commands.command(name="see_effects_of_a_player",description="permet de voir les effets d'un joueur")
     async def see_effects_of_a_player(self,interaction: discord.Interaction, user:discord.Member):
         await interaction.response.defer()
@@ -148,6 +104,52 @@ class ItemsOwned(commands.Cog):
                 await interaction.edit_original_response(content=f"il n'aucun effet")
         else:
             await interaction.edit_original_response(content="vous n'avez pas le bon role")
+
+    #players
+    @app_commands.command(name="see_effects",description="permet de voir ses effets")
+    async def see_effects(self,interaction: discord.Interaction):
+        await interaction.response.defer()
+        player = global_functions.Player(interaction.user.name,interaction.user.id)
+        player.is_player()
+        text=""
+        for i in player.caracter[4]:
+            item=global_functions.Items("pomme",id=i['id'])
+            if item.is_item(x=6) and item.caracter[4]:
+                effet=""
+                if i['nb']>=len(item.caracter[4]):
+                    effet=item.caracter[4][-1]
+                else:
+                    effet=item.caracter[4][i['nb']-1]
+                text+=f"l'item {item.caracter[0]} vous octroy l'effet: {effet} \n"
+        if text !="":
+            await interaction.edit_original_response(content=text)
+        else:
+            await interaction.response.send_message(f":x: **Vous n'avez aucun effet.** :x:")
+    
+    @app_commands.command(name="see_items",description="permet de voir ses items")
+    async def see_items(self,interaction:discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        player = global_functions.Player(interaction.user.name,interaction.user.id)
+        player.is_player()
+        text=""
+        if player.caracter[4]:
+            text+=f"**   {Datas.emogi_cristal} Ton inventaire : {Datas.emogi_cristal}**\n\n"
+            text+=f"__**Objets :**__\n"
+        items_tried = []
+        for i in range(1,7):
+            for item in player.caracter[4]:
+                iteme=global_functions.Items("pomme",id=item['id'])
+                iteme.is_item(x=6)
+                if iteme.caracter[1]==i:
+                    items_tried.append(item)
+        for item in items_tried:
+            iteme=global_functions.Items("pomme",id=item['id'])
+            iteme.is_item(x=6)
+            stars = "".join([":star:" for i in range(iteme.caracter[1])])
+            text+=f"{stars} - **{iteme.caracter[0]} (x{item['nb']}) **\n"
+        if not text:
+            text="malheureusement vous ne possédez aucun item, n'hésitez pas à faire des tirages pour en avoir "
+        await interaction.edit_original_response(content=text)
 
 
 async def setup(bot):

@@ -54,7 +54,7 @@ class Arsmote(commands.Cog):
 
     
 
-    @app_commands.command(name="arsmote",description="commande que je teste")
+    @app_commands.command(name="arsmote",description="permet de relancer le tirage d'un item 4 étoiles obtenu lors du dernier tirage")
     async def arsmote(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         player=global_functions.Player(interaction.user.name,interaction.user.id)
