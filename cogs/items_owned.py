@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 
 import global_functions
-
+from datas.datas import Datas
 
 class ItemsOwned(commands.Cog):
     def __init__(self,bot):
@@ -58,10 +58,13 @@ class ItemsOwned(commands.Cog):
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         text=""
+        if player.caracter[4]:
+            text+=f"**   {Datas.emogi_cristal} Ton inventaire : {Datas.emogi_cristal}**\n\n"
+            text+=f"__**Objets :**__\n"
         for item in player.caracter[4]:
             iteme=global_functions.Items("pomme",id=item['id'])
             iteme.is_item(x=6)
-            text+=f"{iteme.caracter[0]}: nombre:{item['nb']} \n"
+            text+=f"**{iteme.caracter[0]} (x{item['nb']}) **\n"
         if not text:
             text="malheureusement vous ne possédez aucun item, n'hésitez pas à faire des tirages pour en avoir "
         await interaction.response.send_message(text)
