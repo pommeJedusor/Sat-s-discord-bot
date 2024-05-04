@@ -1,12 +1,8 @@
-import random, time, discord, json, asyncio, datetime
+import discord, json, datetime
 from discord.ext import commands
-from discord import app_commands
 from datas.datas import Datas
-from typing import Optional
 
 import global_functions
-
-            
 
 
 intents = discord.Intents.all()
