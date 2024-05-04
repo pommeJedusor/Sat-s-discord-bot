@@ -48,23 +48,23 @@ class Question(commands.Cog):
 
     @app_commands.command(name="oubli_question", description="si mention ajouté à la queston de la semaine par edit")
     async def oubli_question(self,interaction:discord.Interaction,gemmes:int,énième_message:int=None,message_id:str=None):
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
         try:
             if message_id:
                 message_id = int(message_id)
         except:
-            await interaction.edit_original_response(content=f"entrez un nombre valide",ephemeral=True)
+            await interaction.edit_original_response(content=f"entrez un nombre valide")
             return 0
         right_message = None
         channel_question=self.bot.get_channel(Datas.channel_question)
         if not global_functions.bon_role(interaction.user):
-            await interaction.edit_original_response(content=f"vous n'avez pas le bon rôle",ephemeral=True)
+            await interaction.edit_original_response(content=f"vous n'avez pas le bon rôle")
             return 0
         elif (énième_message and message_id):
-            await interaction.edit_original_response(content=f"vous ne pouvez pas choisir 'énèime message' et 'message id' en même temps",ephemeral=True)
+            await interaction.edit_original_response(content=f"vous ne pouvez pas choisir 'énèime message' et 'message id' en même temps")
             return 0
         elif not (énième_message or message_id):
-            await interaction.edit_original_response(content=f"vous devez choisir 'énième message' 'ou message_id'",ephemeral=True)
+            await interaction.edit_original_response(content=f"vous devez choisir 'énième message' 'ou message_id'")
             return 0
         elif message_id:
             async for message in channel_question.history(oldest_first=False):
