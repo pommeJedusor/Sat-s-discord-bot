@@ -18,6 +18,7 @@ async def on_ready():
         await bot.load_extension("cogs.tirage")
         await bot.load_extension("cogs.arsmote")
         await bot.load_extension("cogs.question")
+        #await bot.load_extension("cogs.help")
         synced = await bot.tree.sync()
         print(f"synced {len(synced) }command(s)")
     except Exception as e:
@@ -51,6 +52,8 @@ async def on_raw_reaction_add(payload):
         player.caracter[7].append(payload.message_id)
         player.caracter[2]+=1
         player.update_stats_player_fichier()
+        bot_channel = bot.get_channel(Datas.channel_message_bot)
+        await bot_channel.send(f"{payload.member.name} a voté pour le host et gagné 1 gemme ")
 
 @bot.event
 async def on_message(message):
@@ -79,6 +82,7 @@ async def on_message(message):
                 bot_channel = bot.get_channel(Datas.channel_message_bot)
                 await bot_channel.send(f"<@{message.author.id}> erreur: le message doit absolument commencer par 'question A', A étant le nombre de gemmes veuillez supprimer et renvoyer le message pour que cela puisse fonctionné")
         elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("!question")==-1 and not line["id_users"]==False and not message.author.id in line['id_users']: 
+            #si un joueur réponds à la question
             player=global_functions.Player(message.author.name,message.author.id)
             player.is_player()
             player.caracter[2]+=line['nb_gemmes']
@@ -86,6 +90,8 @@ async def on_message(message):
             with open(Datas.question_file,"w") as f:
                 f.write(json.dumps(line))
             player.update_stats_player_fichier()
+            bot_channel = bot.get_channel(Datas.channel_message_bot)
+            await bot_channel.send(f"{message.author.name} a répondu à la question de la semaine et a gagné {line['nb_gemmes']} cristaux")
 
 
 
