@@ -14,19 +14,21 @@ class Items(commands.Cog):
 
     @app_commands.command(name="create_item",description="permet à un modo de creer un item")
     async def create_item(self,interaction:discord.Interaction,name:str,nombre_d_étoiles:int,indice_drop:int,img_link:str):
+        await interaction.response.defer()
         item=global_functions.Items(name,nombre_d_étoiles,indice_drop,img_link,id=random.randint(1,1000000000))
         if not item.is_item() and global_functions.bon_role(interaction.user):
             if item.add_item():
-                await interaction.response.send_message(f"l'item {name} {nombre_d_étoiles} étoiles avec un indice de drop {indice_drop} a bien été rajouté à la base de donnés")
+                await interaction.edit_original_response(content=f"l'item {name} {nombre_d_étoiles} étoiles avec un indice de drop {indice_drop} a bien été rajouté à la base de donnés")
             else:
-                await interaction.response.send_message("l'ajout de l'item a échoué pour des raisons inconnus")
+                await interaction.edit_original_response(content="l'ajout de l'item a échoué pour des raisons inconnus")
         elif not global_functions.bon_role(interaction.user):
-            await interaction.response.send_message("vous n'avez pas le bon role")
+            await interaction.edit_original_response(content="vous n'avez pas le bon role")
         else:
-            await interaction.response.send_message(f"l'item {name} existe déja")
+            await interaction.edit_original_response(content=f"l'item {name} existe déja")
 
     @app_commands.command(name="edit_item",description="permet à un modo de modifier un item")
     async def edit_item(self,interaction:discord.Interaction,name:str,nombre_d_étoiles:Optional[int],indice_drop:Optional[int],image_link:Optional[str],effets:Optional[str],tirage_active:Optional[bool],new_name:Optional[str]):
+        await interaction.response.defer()
         item=global_functions.Items(name)
         if item.is_item() and global_functions.bon_role(interaction.user):
             item.caracter[0]=name
@@ -56,11 +58,11 @@ class Items(commands.Cog):
                 else:
                     message+=f"est dans les tirages: non\n"
             item.update_item()
-            await interaction.response.send_message(message)
+            await interaction.edit_original_response(content=message)
         elif not global_functions.bon_role(interaction.user):
-            await interaction.response.send_message(f"vous n'avez pas le bon rôle ")
+            await interaction.edit_original_response(content=f"vous n'avez pas le bon rôle ")
         else:
-            await interaction.response.send_message(f"l'item {name} n'as pas été trouvé ")
+            await interaction.edit_original_response(content=f"l'item {name} n'as pas été trouvé ")
     
     @app_commands.choices(tri=[
     app_commands.Choice(name="stars", value="stars"),
@@ -68,64 +70,70 @@ class Items(commands.Cog):
     ])
     @app_commands.command(name="see_all_items",description="permet de voir tous les items")
     async def see_all_items(self,interaction:discord.Interaction,stars:int=None,active:bool=None,drop:int=None, tri :app_commands.Choice[str]=None):
+        await interaction.response.defer()
+        if global_functions.bon_role(interaction.user):
 
-        stars_filter = lambda ligne: stars==None or ligne[1]==stars
-        active_filter = lambda ligne: active==None or ligne[5]==active
-        drop_filter = lambda ligne: drop==None or ligne[2]==drop
+            stars_filter = lambda ligne: stars==None or ligne[1]==stars
+            active_filter = lambda ligne: active==None or ligne[5]==active
+            drop_filter = lambda ligne: drop==None or ligne[2]==drop
 
-        items=[]
-        lignes=[]
-        with open(Datas.items_file,'r')as f:
-            for ligne in f:
-                ligne=json.loads(ligne)
-                lignes.append(ligne)
+            items=[]
+            lignes=[]
+            with open(Datas.items_file,'r')as f:
+                for ligne in f:
+                    ligne=json.loads(ligne)
+                    lignes.append(ligne)
 
-        lignes = list(filter(active_filter,lignes))
-        lignes = list(filter(stars_filter,lignes))
-        lignes = list(filter(drop_filter,lignes))
-        items_tried = lignes
-        if (tri and tri.value=="stars") or tri==None:
-            items_tried = []
-            for i in range(1,7):
-                for ligne in lignes:
-                    if ligne[1]==i:
-                        items_tried.append(ligne)
-        if tri and tri.value=="name":
-            items_tried = sorted(lignes)
-        lignes = items_tried
+            lignes = list(filter(active_filter,lignes))
+            lignes = list(filter(stars_filter,lignes))
+            lignes = list(filter(drop_filter,lignes))
+            items_tried = lignes
+            if (tri and tri.value=="stars") or tri==None:
+                items_tried = []
+                for i in range(1,7):
+                    for ligne in lignes:
+                        if ligne[1]==i:
+                            items_tried.append(ligne)
+            if tri and tri.value=="name":
+                items_tried = sorted(lignes)
+            lignes = items_tried
 
-        for ligne in lignes:
-            stars = "".join([":star:" for i in range(ligne[1])])
-            if ligne[5]:
-                items.append(f"{stars} - **__{ligne[0]}__**  - Taux : {ligne[2]}  - Présent\n")
-            else:
-                items.append(f"{stars} - **__{ligne[0]}__**  - Taux : {ligne[2]}  - Absent\n")
-        await interaction.response.send_message(f"**  {Datas.emogi_cristal}  Liste des objets:{Datas.emogi_cristal}**\n\n__**Objets :**__")
-        await interaction.channel.send("".join(items[:10]))
-        for i in range(1,(len(items)-1)//10+1):
-            await interaction.channel.send("".join(items[10*i:10*i+10]))
+            for ligne in lignes:
+                stars = "".join([":star:" for i in range(ligne[1])])
+                if ligne[5]:
+                    items.append(f"{stars} - **__{ligne[0]}__**  - Taux : {ligne[2]}  - Présent\n")
+                else:
+                    items.append(f"{stars} - **__{ligne[0]}__**  - Taux : {ligne[2]}  - Absent\n")
+            await interaction.edit_original_response(content=f"**  {Datas.emogi_cristal}  Liste des objets:{Datas.emogi_cristal}**\n\n__**Objets :**__")
+            await interaction.channel.send("".join(items[:10]))
+            for i in range(1,(len(items)-1)//10+1):
+                await interaction.channel.send("".join(items[10*i:10*i+10]))
+        else:
+            await interaction.edit_original_response(content="vous n'avez pas le bon rôle")
 
     @app_commands.command(name="delete_item",description="permet de supprimer un item")
     async def delete_item(self,interaction:discord.Interaction,name:str):
+        await interaction.response.defer()
         item=global_functions.Items(name)
         if item.is_item() and global_functions.bon_role(interaction.user):
             item.delete_item()
-            await interaction.response.send_message(f"l'item {name} a été supprimé ")
+            await interaction.edit_original_response(content=f"l'item {name} a été supprimé ")
         elif not global_functions.bon_role(interaction.user):
-            await interaction.response.send_message("vous n'avez pas le bon role")
+            await interaction.edit_original_response(content="vous n'avez pas le bon role")
         else:
-            await interaction.response.send_message(f"l'item {name} n'as pas été trouvé")
+            await interaction.edit_original_response(content=f"l'item {name} n'as pas été trouvé")
     
 
     @app_commands.command(name="see_image_item",description="permet de voir l'image d'un item")
     async def change_channel(self,interaction:discord.Interaction,name_item:str):
+        await interaction.response.defer()
         item=global_functions.Items(name_item)
         if item.is_item() and item.caracter[3]:
-            await interaction.response.send_message(item.caracter[3])
+            await interaction.edit_original_response(content=item.caracter[3])
         elif not item.caracter[3]:
-            await interaction.response.send_message(f"l'item {item} n'as pas d'image ")
+            await interaction.edit_original_response(content=f"l'item {item} n'as pas d'image ")
         else:
-            await interaction.response.send_message(f"l'item {item} n'as pas été trouvé")
+            await interaction.edit_original_response(content=f"l'item {item} n'as pas été trouvé")
 
     
 
