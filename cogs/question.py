@@ -17,7 +17,7 @@ class Question(commands.Cog):
         if global_functions.bon_role(interaction.user):
             with open(Datas.question_file,"w") as f:
                 f.write(json.dumps({"nb_gemmes": gemmes, "id_users": False, "starttime": time.time(), "message_id": interaction.user.id}))
-            await interaction.response.send_message(f"la commande a été éfféctué avec succès plus qu'a posé la question",ephemeral=True)
+            await interaction.response.send_message(f"la commande a été effectué avec succès, plus qu'a posé la question",ephemeral=True)
         else:
             await interaction.response.send_message(f"c'vous n'avez pas le bon rôle",ephemeral=True)
 
