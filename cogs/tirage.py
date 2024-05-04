@@ -17,7 +17,7 @@ class Tirage(commands.Cog):
         player = global_functions.Player(interaction.user.id,interaction.user.id)
         player.is_player()
         channel_perso=self.bot.get_channel(player.caracter[5])
-        if player.caracter[2]>=nombre_de_tirage and nombre_de_tirage<=10:
+        if player.caracter[2]>=nombre_de_tirage and nombre_de_tirage<=10 and interaction.channel_id==Datas.channel_tirage_gacha:
             await interaction.response.send_message(f"vous avez obtenus...")
 
             #yato
@@ -55,6 +55,8 @@ class Tirage(commands.Cog):
                         await channel_perso.send(f"{i.caracter[3]}")
                     if not interaction.channel==channel_perso:
                         await interaction.channel.send(f"{i.caracter[3]}")
+        elif not interaction.channel_id==Datas.channel_tirage_gacha:
+            await interaction.response.send_message(f"vous êtes dans le mauvais channel aller dans tirage gacha pour effectuer cette commande",ephemeral=True)
         elif nombre_de_tirage>10:
             await interaction.response.send_message("vous ne pouvez éffectuer qu'un maximum de 10 tirages à la fois")
         else:
