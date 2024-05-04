@@ -4,7 +4,9 @@ from discord.ext import commands
 
 import json
 
-import global_functions
+from model import global_functions
+from model import ModelPlayer
+
 from datas.datas import Datas
 
 class Powers(commands.Cog):
@@ -33,7 +35,7 @@ class Powers(commands.Cog):
     @app_commands.command(name="yato",description=r"20% de chances d'obtenir 2 cristaux durant 10 tirages l'reste=items")
     async def yato(self,interaction: discord.Interaction):
         await interaction.response.defer()
-        player=global_functions.Player(interaction.user.name,interaction.user.id)
+        player=ModelPlayer.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         if {"id":Datas.Yato_id,"active":True} in player.powers and not player.yato_tirages>0:
             player.yato_tirages=10
@@ -52,7 +54,7 @@ class Powers(commands.Cog):
     @app_commands.command(name="panda",description=r"utilise la capacité de panda et réduit de 10% la pity a avoir")
     async def panda(self,interaction: discord.Interaction):
         await interaction.response.defer()
-        player=global_functions.Player(interaction.user.name,interaction.user.id)
+        player=ModelPlayer.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         if {"id":Datas.panda_id,"active":True} in player.powers:
             #nombre de pandas possédé par le player

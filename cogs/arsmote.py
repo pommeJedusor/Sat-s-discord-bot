@@ -2,7 +2,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-import global_functions
+from model import ModelPlayer
+from model import ModelItem
+
 from datas.datas import Datas
 
 class Dropdown(discord.ui.Select):
@@ -20,9 +22,9 @@ class Dropdown(discord.ui.Select):
         super().__init__(placeholder="choisissez l'item que vous souhaitez reroll", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
-        player = global_functions.Player(name=interaction.user.name,id=interaction.user.id)
+        player = ModelPlayer.Player(name=interaction.user.name,id=interaction.user.id)
         player.is_player()
-        item = global_functions.Items(name="pomme",id=self.values[0])
+        item = ModelItem.Items(name="pomme",id=self.values[0])
         item.is_item(x=6)
         channel_perso=self.bot.get_channel(player.salon)
 
@@ -57,7 +59,7 @@ class Arsmote(commands.Cog):
     @app_commands.command(name="arsmote",description="permet de relancer le tirage d'un item 4 étoiles obtenu lors du dernier tirage")
     async def arsmote(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        player=global_functions.Player(interaction.user.name,interaction.user.id)
+        player=ModelPlayer.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         items = []
         if {"id":Datas.arsmote_id,"active":True} in player.powers:
@@ -66,7 +68,7 @@ class Arsmote(commands.Cog):
                     items.append(item)
             true_items = []
             for item in items:
-                item = global_functions.Items("nimp",id=item)
+                item = ModelItem.Items("nimp",id=item)
                 item.is_item(x=6)
                 if item.stars == 4:
                     true_items.append({"name":item.name,"id":item.id})

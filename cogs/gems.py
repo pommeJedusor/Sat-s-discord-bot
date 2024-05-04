@@ -1,9 +1,13 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-import global_functions
-from datas.datas import Datas
+
 import json
+
+from model import global_functions
+from model import ModelPlayer
+
+from datas.datas import Datas
 
 class Gems(commands.Cog):
     def __init__(self,bot):
@@ -14,7 +18,7 @@ class Gems(commands.Cog):
     async def add_gems(self,interaction: discord.Interaction, nombre_de_gemmes: int, user: discord.Member):
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user) and nombre_de_gemmes>0:
-            player = global_functions.Player(user.name,user.id)
+            player = ModelPlayer.Player(user.name,user.id)
             player.is_player()
             player.nb_gemmes+=nombre_de_gemmes
             player.update_stats_player_fichier()
@@ -30,7 +34,7 @@ class Gems(commands.Cog):
     async def see_gems_of_a_player(self,interaction : discord.Interaction, user : discord.Member):
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user):
-            player = global_functions.Player(user.name,user.id)
+            player = ModelPlayer.Player(user.name,user.id)
             player.is_player()
             await interaction.edit_original_response(content=f"{Datas.emogi_cristal} **{user.name}** possède **{player.nb_gemmes} Cristaux d'Expédition ** ! {Datas.emogi_cristal}\n{Datas.emogi_cristal} a dépensé au total **{player.gemmes_spend} Cristaux d'Expédition **! {Datas.emogi_cristal}")
         else:
@@ -40,7 +44,7 @@ class Gems(commands.Cog):
     @app_commands.describe(depenser="True pour enlever les gemmes et augmenter 'les gemmes dépenser', False pour juste les enlever")
     async def spend_gems(self,interaction:discord.Interaction,user:discord.Member,nombres_de_gemmes:int,depenser:bool=False):
         await interaction.response.defer()
-        player=global_functions.Player(user.name,user.id)
+        player=ModelPlayer.Player(user.name,user.id)
         player.is_player()
         if global_functions.bon_role(interaction.user) and player.nb_gemmes>=nombres_de_gemmes>0:
             player.nb_gemmes-=nombres_de_gemmes
@@ -95,7 +99,7 @@ class Gems(commands.Cog):
     @app_commands.command(name="see_gems",description="permet de voir son nombre de gemmes possédés et dépensé ")
     async def see_gems(self,interaction : discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        player = global_functions.Player(interaction.user.name,interaction.user.id)
+        player = ModelPlayer.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         await interaction.edit_original_response(content=f"{Datas.emogi_cristal} Vous possédez **{player.nb_gemmes} Cristaux d'Expédition** ! {Datas.emogi_cristal}\n{Datas.emogi_cristal} Vous avez dépensez au total **{player.gemmes_spend} Cristaux d'Expédition** ! {Datas.emogi_cristal}")
                 

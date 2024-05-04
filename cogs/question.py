@@ -3,12 +3,12 @@ from discord.ext import commands
 import discord
 import datetime
 
-import global_functions
+from model import global_functions
+from model import ModelPlayer
+
 import json
 
 from datas.datas import Datas
-
-import random
 
 PROPOSITON_QUESTION_FILE = "datas/datas_propositions_questions.txt"
 PAST_PROPOSITON_QUESTION_FILE = "datas/datas_past_propositions_questions.txt"
@@ -51,7 +51,7 @@ class Question(commands.Cog):
         #fonctionnemnt rétroactif
         for id_user in line["id_users"]:
             user = self.bot.get_user(id_user)
-            player = global_functions.Player(user.name,user.id)
+            player = ModelPlayer.Player(user.name,user.id)
             player.is_player()
             player.nb_gemmes+=dif_gems
             player.update_stats_player_fichier()
@@ -157,7 +157,7 @@ class Question(commands.Cog):
                 with open(PAST_PROPOSITON_QUESTION_FILE,"a") as f:
                     f.write(json.dumps(line)+"\n")
 
-                player = global_functions.Player("pomme",final_line[0])
+                player = ModelPlayer.Player("pomme",final_line[0])
                 player.is_player()
                 player.nb_gemmes+=gems_number_reward
                 player.update_stats_player_fichier()

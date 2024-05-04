@@ -5,7 +5,9 @@ from discord import app_commands
 import json, random
 from typing import Optional
 
-import global_functions
+from model import global_functions
+from model import ModelItem
+
 from datas.datas import Datas
 
 class Items(commands.Cog):
@@ -16,7 +18,7 @@ class Items(commands.Cog):
     @app_commands.command(name="create_item",description="permet à un modo de creer un item")
     async def create_item(self,interaction:discord.Interaction,name:str,nombre_d_étoiles:int,indice_drop:int,img_link:str):
         await interaction.response.defer()
-        item=global_functions.Items(name,nombre_d_étoiles,indice_drop,img_link,id=random.randint(1,1000000000))
+        item=ModelItem.Items(name,nombre_d_étoiles,indice_drop,img_link,id=random.randint(1,1000000000))
         if not item.is_item() and global_functions.bon_role(interaction.user):
             if item.add_item():
                 await interaction.edit_original_response(content=f"l'item {name} {nombre_d_étoiles} étoiles avec un indice de drop {indice_drop} a bien été rajouté à la base de donnés")
@@ -30,12 +32,12 @@ class Items(commands.Cog):
     @app_commands.command(name="edit_item",description="permet à un modo de modifier un item")
     async def edit_item(self,interaction:discord.Interaction,name:str,nombre_d_étoiles:Optional[int],indice_drop:Optional[int],image_link:Optional[str],effets:Optional[str],tirage_active:Optional[bool],new_name:Optional[str]):
         await interaction.response.defer()
-        item=global_functions.Items(name)
+        item=ModelItem.Items(name)
         if item.is_item() and global_functions.bon_role(interaction.user):
             item.name=name
             message=f"l'item {name} a bien été modifié, et à comme caractéristique:\n"
             if new_name is not None:
-                new_item=global_functions.Items(new_name)
+                new_item=ModelItem.Items(new_name)
                 if not new_item.is_item():
                     item.name=new_name
                     message=f"l'item {name} ({new_name} maintenant) a bien été modifié, et à comme caractéristique:\n"
@@ -68,7 +70,7 @@ class Items(commands.Cog):
     @app_commands.command(name="delete_item",description="permet de supprimer un item")
     async def delete_item(self,interaction:discord.Interaction,name:str):
         await interaction.response.defer()
-        item=global_functions.Items(name)
+        item=ModelItem.Items(name)
         if item.is_item() and global_functions.bon_role(interaction.user):
             item.delete_item()
             await interaction.edit_original_response(content=f"l'item {name} a été supprimé ")
@@ -126,7 +128,7 @@ class Items(commands.Cog):
     @app_commands.command(name="see_image_item",description="permet de voir l'image d'un item")
     async def change_channel(self,interaction:discord.Interaction,name_item:str):
         await interaction.response.defer()
-        item=global_functions.Items(name_item)
+        item=ModelItem.Items(name_item)
         if item.is_item() and item.url_img:
             await interaction.edit_original_response(content=item.url_img)
         elif not item.url_img:

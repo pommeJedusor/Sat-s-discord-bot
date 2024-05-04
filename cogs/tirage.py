@@ -2,10 +2,12 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-import global_functions
-from datas.datas import Datas
+import asyncio
 
-import random, asyncio
+from model import global_functions
+from model import ModelPlayer
+
+from datas.datas import Datas
 
 tirage_en_cours = False
 
@@ -17,7 +19,7 @@ class Tirage(commands.Cog):
     @app_commands.command(name="change_channel",description="permet de changer ou d'initialiser le channel d'un joueur")
     async def change_channel(self,interaction:discord.Interaction,user:discord.Member):
         await interaction.response.defer()
-        player = global_functions.Player(user.name,user.id)
+        player = ModelPlayer.Player(user.name,user.id)
         player.is_player()
         if global_functions.bon_role(interaction.user):
             player.salon=interaction.channel_id
@@ -30,7 +32,7 @@ class Tirage(commands.Cog):
     async def see_pity_of_a_player(self,interaction:discord.Interaction,user:discord.Member):
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user):
-            player=global_functions.Player(user.name,user.id)
+            player=ModelPlayer.Player(user.name,user.id)
             player.is_player()
             await interaction.edit_original_response(content=f"pour l'obtention d'une 4 étoiles: {player.pity[0]}/{player.pity[2]} \n pour l'obtention d'une 5 étoiles: {player.pity[1]}/{player.pity[3]}\n pour l'obtention d'une 6 étoiles: {player.pity[4]}/{player.pity[5]}")
         else:
@@ -40,7 +42,7 @@ class Tirage(commands.Cog):
     async def edit_pity_of_a_player(self,interaction:discord.Interaction,user:discord.Member,dénominateur_4:int=False,dénominateur_5:int=False,numérateur_4:int=False,numérateur_5:int=False,dénominateur_6:int=False,numérateur_6:int=False):
         if global_functions.bon_role(interaction.user):
             await interaction.response.defer()
-            player = global_functions.Player(user.name,user.id)
+            player = ModelPlayer.Player(user.name,user.id)
             player.is_player()
             if not numérateur_5:
                 numérateur_5=player.pity[1]
@@ -65,7 +67,7 @@ class Tirage(commands.Cog):
     async def tirages(self,interaction:discord.Interaction,nombre_de_tirage:int):
         global tirage_en_cours
         await interaction.response.defer()
-        player = global_functions.Player(interaction.user.id,interaction.user.id)
+        player = ModelPlayer.Player(interaction.user.id,interaction.user.id)
         player.is_player()
         channel_perso=self.bot.get_channel(player.salon)
         if player.nb_gemmes>=nombre_de_tirage and nombre_de_tirage<=10 and interaction.channel_id==Datas.channel_tirage_gacha and not tirage_en_cours:
@@ -124,7 +126,7 @@ class Tirage(commands.Cog):
     @app_commands.command(name="see_pity",description="permet de voir sa pity")
     async def voir_sa_pity(self,interaction:discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        player=global_functions.Player(interaction.user.name,interaction.user.id)
+        player=ModelPlayer.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         await interaction.edit_original_response(content=f"**Votre pity :star::star::star::star: : {player.pity[0]}/{player.pity[2]} **\n**Votre pity :star::star::star::star::star: : {player.pity[1]}/{player.pity[3]} **\n**Votre pity :star::star::star::star::star::star: : {player.pity[4]}/{player.pity[5]} **")
 

@@ -2,7 +2,8 @@ import discord, json, datetime
 from discord.ext import commands
 from datas.datas import Datas
 
-import global_functions
+from model import global_functions
+from model import ModelPlayer
 
 cogs = ["gems","items_owned","items","powers","tirage","arsmote","question","help"]
 
@@ -75,7 +76,7 @@ async def reload_cogs(interaction:discord.Interaction):
 @bot.event
 async def on_raw_reaction_add(payload):
     channel=bot.get_channel(Datas.hosts_id)
-    player=global_functions.Player(payload.member.name,payload.user_id)
+    player=ModelPlayer.Player(payload.member.name,payload.user_id)
     player.is_player()
     if payload.message_id ==channel.last_message_id and not payload.message_id in player.votes:
         player.votes.append(payload.message_id)
@@ -104,7 +105,7 @@ async def on_message(message):
 
         elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("@everyone")==-1 and not line["id_users"]==False and not message.author.id in line['id_users']: 
             #si un joueur réponds à la question
-            player=global_functions.Player(message.author.name,message.author.id)
+            player=ModelPlayer.Player(message.author.name,message.author.id)
             player.is_player()
             player.nb_gemmes+=line['nb_gemmes']
             line['id_users'].append(message.author.id)
@@ -133,7 +134,7 @@ async def on_message(message):
 
         elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("<@&1159869065934934076>")==-1 and not line["id_users"]==False and not message.author.id in line['id_users'] and line['nb_gemmes']: 
             #si un joueur fournit une review de l'event
-            player=global_functions.Player(message.author.name,message.author.id)
+            player=ModelPlayer.Player(message.author.name,message.author.id)
             player.is_player()
             player.nb_gemmes+=line['nb_gemmes']
             line['id_users'].append(message.author.id)

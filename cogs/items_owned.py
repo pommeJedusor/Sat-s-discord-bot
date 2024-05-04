@@ -2,7 +2,10 @@ from discord.ext import commands
 import discord
 from discord import app_commands
 
-import global_functions
+from model import global_functions
+from model import ModelPlayer
+from model import ModelItem
+
 from datas.datas import Datas
 
 class ItemsOwned(commands.Cog):
@@ -14,9 +17,9 @@ class ItemsOwned(commands.Cog):
     async def add_item_to_a_player(self,interaction:discord.Interaction,user:discord.Member,name:str,nombre:int=1):
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user):
-            player=global_functions.Player(user.name,user.id)
+            player=ModelPlayer.Player(user.name,user.id)
             player.is_player()
-            item=global_functions.Items(name)
+            item=ModelItem.Items(name)
             if item.is_item() and nombre>0:
                 player.add_item([{"id":item.id,"nb":nombre}])
                 await interaction.edit_original_response(content=f":gift: **L'objet __{name}__ (x{nombre}) a bien été ajouté à {user.name}** :gift:")
@@ -31,9 +34,9 @@ class ItemsOwned(commands.Cog):
     async def remove_item_from_a_player(self,interaction:discord.Interaction,user:discord.Member,name:str,nombre:int=1):
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user):
-            player=global_functions.Player(user.name,user.id)
+            player=ModelPlayer.Player(user.name,user.id)
             player.is_player()
-            item=global_functions.Items(name)
+            item=ModelItem.Items(name)
             if item.is_item():
                 item_filter = lambda items: items["id"]==item.id
                 item_player = list(filter(item_filter,player.items))
@@ -60,18 +63,18 @@ class ItemsOwned(commands.Cog):
     async def see_items_of_a_player(self,interaction:discord.Interaction, user:discord.Member):
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user):
-            player = global_functions.Player(user.name,user.id)
+            player = ModelPlayer.Player(user.name,user.id)
             player.is_player()
             text=""
             items_tried = []
             for i in range(1,7):
                 for item in player.items:
-                    iteme=global_functions.Items("pomme",id=item['id'])
+                    iteme=ModelItem.Items("pomme",id=item['id'])
                     iteme.is_item(x=6)
                     if iteme.stars==i:
                         items_tried.append(item)
             for item in items_tried:
-                iteme=global_functions.Items("pomme",id=item['id'])
+                iteme=ModelItem.Items("pomme",id=item['id'])
                 iteme.is_item(x=6)
                 stars = "".join([":star:" for i in range(iteme.stars)])
                 text+=f"{stars} - **{iteme.name} (x{item['nb']}) **\n"
@@ -86,11 +89,11 @@ class ItemsOwned(commands.Cog):
     async def see_effects_of_a_player(self,interaction: discord.Interaction, user:discord.Member):
         await interaction.response.defer()
         if global_functions.bon_role(interaction.user):
-            player=global_functions.Player(user.name,user.id)
+            player=ModelPlayer.Player(user.name,user.id)
             player.is_player()
             text=""
             for i in player.items:
-                item=global_functions.Items("pomme",id=i['id'])
+                item=ModelItem.Items("pomme",id=i['id'])
                 if item.is_item(x=6) and item.effects:
                     effet=""
                     if i['nb']>=len(item.effects):
@@ -109,11 +112,11 @@ class ItemsOwned(commands.Cog):
     @app_commands.command(name="see_effects",description="permet de voir ses effets")
     async def see_effects(self,interaction: discord.Interaction):
         await interaction.response.defer()
-        player = global_functions.Player(interaction.user.name,interaction.user.id)
+        player = ModelPlayer.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         text=""
         for i in player.items:
-            item=global_functions.Items("pomme",id=i['id'])
+            item=ModelItem.Items("pomme",id=i['id'])
             if item.is_item(x=6) and item.effects:
                 effet=""
                 if i['nb']>=len(item.effects):
@@ -129,7 +132,7 @@ class ItemsOwned(commands.Cog):
     @app_commands.command(name="see_items",description="permet de voir ses items")
     async def see_items(self,interaction:discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        player = global_functions.Player(interaction.user.name,interaction.user.id)
+        player = ModelPlayer.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         text=""
         if player.items:
@@ -138,12 +141,12 @@ class ItemsOwned(commands.Cog):
         items_tried = []
         for i in range(1,7):
             for item in player.items:
-                iteme=global_functions.Items("pomme",id=item['id'])
+                iteme=ModelItem.Items("pomme",id=item['id'])
                 iteme.is_item(x=6)
                 if iteme.stars==i:
                     items_tried.append(item)
         for item in items_tried:
-            iteme=global_functions.Items("pomme",id=item['id'])
+            iteme=ModelItem.Items("pomme",id=item['id'])
             iteme.is_item(x=6)
             stars = "".join([":star:" for i in range(iteme.stars)])
             text+=f"{stars} - **{iteme.name} (x{item['nb']}) **\n"
