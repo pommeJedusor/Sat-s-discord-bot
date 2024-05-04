@@ -87,7 +87,7 @@ class Tirage(commands.Cog):
     async def voir_sa_pity(self,interaction:discord.Interaction):
         player=global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
-        await interaction.response.send_message(f"**Votre pity :star::star::star::star: : {player.caracter[6][0]}/{player.caracter[6][2]} **\n**Votre pity :star::star::star::star::star: : {player.caracter[6][1]}/{player.caracter[6][3]} **")
+        await interaction.response.send_message(f"**Votre pity :star::star::star::star: : {player.caracter[6][0]}/{player.caracter[6][2]} **\n**Votre pity :star::star::star::star::star: : {player.caracter[6][1]}/{player.caracter[6][3]} **",ephemeral=True)
 
     @app_commands.command(name="see_pity_of_a_player",description="permet de voir la pity d'un joueur")
     async def see_pity_of_a_player(self,interaction:discord.Interaction,user:discord.Member):
