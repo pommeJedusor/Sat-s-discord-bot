@@ -185,7 +185,7 @@ class Question(commands.Cog):
                 data.append({"number":f"{compteur})","question":line[1],"votes":line[2],"user":username})
                 compteur+=1
 
-        pagination_view = PaginationView(timeout=None)
+        pagination_view = PaginationViewDelete(timeout=None)
         pagination_view.data = data
         await pagination_view.send(interaction)
             
@@ -275,6 +275,13 @@ class PaginationView(discord.ui.View):
         await interaction.response.defer()
         self.current_page = int(len(self.data) / self.sep) + 1
         await self.update_message(interaction, self.get_current_page_data())
+
+class PaginationViewDelete(PaginationView):
+    def create_embed(self, data):
+        embed = discord.Embed(title=f"liste des questions supprimées {self.current_page} / {int(len(self.data) / self.sep) + 1}:")
+        for item in data:
+            embed.add_field(name=item['number'], value=f"{item['question']}\nuser: {item['user']}", inline=False)
+        return embed
 
 async def setup(bot):
     global BOT
