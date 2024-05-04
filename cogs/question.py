@@ -82,8 +82,67 @@ class Question(commands.Cog):
         else:
             await interaction.edit_original_response(content=f"le message n'as pas été trouvé")
 
+    @app_commands.command(name="question_vote", description="permet de voter pour une proposition de question")
+    async def question_vote(self,interaction:discord.Interaction,question_number: int):
+        await interaction.response.defer(ephemeral=True)
+        if global_functions.bon_role(interaction.user):
+            with open(PROPOSITON_QUESTION_FILE,"r") as f:
+                compteur = 1
+                text=""
+                exist=False
+                for line in f:
+                    line=json.loads(line)
+                    if compteur==question_number:
+                        line[2]+=1
+                        exist=True
+                    text+=json.dumps(line)+"\n"
+                    compteur+=1
+            with open(PROPOSITON_QUESTION_FILE,"w") as f:
+                f.write(text)
+            
+            if not exist:
+                await interaction.edit_original_response(content="question non trouvé, veuillez à vérifier le nombre de la question entrée")
+            else:
+                await interaction.edit_original_response(content="vote ajouté avec scuccès")
+        else:
+            await interaction.edit_original_response(content="vous n'avez pas le bon rôle")
+
+    @app_commands.command(name="recompense_question", description="permet de supprimer la question et de récompenser le joueur")
+    async def recompense_question(self,interaction:discord.Interaction,question_number: int,gems_number_reward: int):
+        await interaction.response.defer(ephemeral=True)
+        if global_functions.bon_role(interaction.user):
+            with open(PROPOSITON_QUESTION_FILE,"r") as f:
+                compteur = 0
+                final_line=False
+                text=""
+                for line in f:
+                    compteur+=1
+                    line=json.loads(line)
+                    if compteur==question_number:
+                        final_line = line
+                        continue
+                    text+=json.dumps(line)+"\n"
+            if final_line:
+                with open(PROPOSITON_QUESTION_FILE,"w") as f:
+                    f.write(text)
+                player = global_functions.Player("pomme",final_line[0])
+                player.is_player()
+                player.nb_gemmes+=gems_number_reward
+                player.update_stats_player_fichier()
+                await interaction.edit_original_response(content="recompense distribué avec succès")
+            else:
+                await interaction.edit_original_response(content="question non trouvé veuillez vérifier le nombre de la question")
+        else:
+            await interaction.edit_original_response(content="vous n'avez pas le bon rôle")
+
+    #players
+    @app_commands.command(name="proposition_question", description="permet de proposer une question pour la question de la semaine")
+    async def proposition_question(self,interaction:discord.Interaction):
+        await interaction.response.send_modal(QuestionModal())
+
     @app_commands.command(name="voir_les_questions", description="permet de voir les question proposé par les joueurs")
     async def voir_les_questions(self,interaction:discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         data = []
 
         with open(PROPOSITON_QUESTION_FILE, 'r') as f:
@@ -96,33 +155,6 @@ class Question(commands.Cog):
         pagination_view = PaginationView(timeout=None)
         pagination_view.data = data
         await pagination_view.send(interaction)
-
-    @app_commands.command(name="question_vote", description="permet de voter pour une proposition de question")
-    async def question_vote(self,interaction:discord.Interaction,question_number: int):
-        await interaction.response.defer(ephemeral=True)
-        with open(PROPOSITON_QUESTION_FILE,"r") as f:
-            compteur = 1
-            text=""
-            exist=False
-            for line in f:
-                line=json.loads(line)
-                if compteur==question_number:
-                    line[2]+=1
-                    exist=True
-                text+=json.dumps(line)+"\n"
-                compteur+=1
-        with open(PROPOSITON_QUESTION_FILE,"w") as f:
-            f.write(text)
-        
-        if not exist:
-            await interaction.edit_original_response(content="question non trouvé, veuillez à vérifier le nombre de la question entrée")
-        else:
-            await interaction.edit_original_response(content="vote ajouté avec scuccès")
-
-    #players
-    @app_commands.command(name="proposition_question", description="permet de proposer une question pour la question de la semaine")
-    async def proposition_question(self,interaction:discord.Interaction):
-        await interaction.response.send_modal(QuestionModal())
             
 class QuestionModal(discord.ui.Modal, title="proposition_question"):
     proposition_question = discord.ui.TextInput(label="proposition_question",style=discord.TextStyle.paragraph)
@@ -140,7 +172,7 @@ class PaginationView(discord.ui.View):
     sep : int = 5
 
     async def send(self, interaction):
-        self.message = await interaction.response.send_message(view=self)
+        self.message = await interaction.edit_original_response(view=self)
         await self.update_message(interaction, self.data[:self.sep])
 
     def create_embed(self, data):
