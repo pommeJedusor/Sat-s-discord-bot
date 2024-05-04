@@ -37,7 +37,7 @@ pour la question de la semaine, vous pouvez mettre au début la commande "!quest
 |see_effects|permet de voir tous les effets attribués par vos objets|
 |panda|réduit de 10% la pity pas réutilisable jusqu'à ce que les modos le réactive, nécéssite l'item panda|
 |arsmote|permet de relancer le tirage d'un item 4 étoiles obtenu lors du dernier tirage(peut réobtenir le même si pas de chance)|
-|yato|nécéssite Yato, pour les 10 prochains tirages 20% de chance de gagner 2 gemmes à la place|
+|yato|nécéssite Yato, pour les 10 prochains tirages 20% de chance de gagner 2 gemmes à la place(si déja activé indique le nombre de tirage active restant)|
 
 ## pour les questions de la semaine
 
