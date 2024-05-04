@@ -18,19 +18,19 @@ class Tirage(commands.Cog):
         if player.caracter[2]>=nombre_de_tirage and nombre_de_tirage<=10:
             await interaction.response.send_message(f"vous avez obtenus...")
             if nombre_de_tirage>player.caracter[10]:
-                poire=player.caracter[10]
+                nombre_de_tentative_gemmes=player.caracter[10]
             else:
-                poire=nombre_de_tirage
-            patate=0
-            for i in range(poire):
+                nombre_de_tentative_gemmes=nombre_de_tirage
+            compteur_de_gemmes=0
+            for i in range(nombre_de_tentative_gemmes):
                 if random.randint(1,5)==4:
-                    patate+=1
+                    compteur_de_gemmes+=1
                     nombre_de_tirage-=1
-                    player.caracter[1]+=2
-                    player.caracter[2]-=1
+                    player.caracter[2]+=1
                     player.caracter[3]+=1
                 player.caracter[10]-=1
-            for i in range(patate):
+            player.update_stats_player_fichier()
+            for i in range(compteur_de_gemmes):
                 await channel_perso.send("vous avez gagné 2 gemmes")
                 if not interaction.channel==channel_perso:
                     await interaction.channel.send("vous avez gagné 2 gemmes")
