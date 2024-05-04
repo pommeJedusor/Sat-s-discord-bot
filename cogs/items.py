@@ -86,7 +86,7 @@ class Items(commands.Cog):
         items_tried = lignes
         if (tri and tri.value=="stars") or tri==None:
             items_tried = []
-            for i in range(1,6):
+            for i in range(1,7):
                 for ligne in lignes:
                     if ligne[1]==i:
                         items_tried.append(ligne)
