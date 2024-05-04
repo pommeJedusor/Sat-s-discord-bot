@@ -4,6 +4,7 @@ from discord.ext import commands
 
 from datas.datas import Datas
 
+import asyncio
 
 
 class SuggestModal(discord.ui.Modal, title="suggestion"):
@@ -29,9 +30,10 @@ class Help(commands.Cog):
 
     @app_commands.command(name="help", description="si besoin d'aide")
     async def help(self, interaction:discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         view=Buttons()
         view.add_item(discord.ui.Button(label="voir les commandes",style=discord.ButtonStyle.link, url="https://github.com/pommeJedusor/Sat-s-discord-bot/blob/main/README.md"))
-        await interaction.response.send_message(view=view,ephemeral=True)
+        await interaction.edit_original_response(view=view)
 
 async def setup(bot):
     global channel_bot
