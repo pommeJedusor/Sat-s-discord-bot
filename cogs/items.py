@@ -62,9 +62,12 @@ class Items(commands.Cog):
         else:
             await interaction.response.send_message(f"l'item {name} n'as pas été trouvé ")
     
-
+    @app_commands.choices(tri=[
+    app_commands.Choice(name="stars", value="stars"),
+    app_commands.Choice(name="name", value="name"),
+    ])
     @app_commands.command(name="see_all_items",description="permet de voir tous les items")
-    async def see_all_items(self,interaction:discord.Interaction,stars:int=None,active:bool=None,drop:int=None):
+    async def see_all_items(self,interaction:discord.Interaction,stars:int=None,active:bool=None,drop:int=None, tri :app_commands.Choice[str]=None):
 
         stars_filter = lambda ligne: stars==None or ligne[1]==stars
         active_filter = lambda ligne: active==None or ligne[5]==active
@@ -80,6 +83,15 @@ class Items(commands.Cog):
         lignes = list(filter(active_filter,lignes))
         lignes = list(filter(stars_filter,lignes))
         lignes = list(filter(drop_filter,lignes))
+
+        if tri and tri.value=="stars":
+            items_tried = []
+            for i in range(1,6):
+                for ligne in lignes:
+                    if ligne[1]==i:
+                        items_tried.append(ligne)
+            for item in items_tried:
+                print(item)
 
         for ligne in lignes:
             items+=f"nom: {ligne[0]}, {ligne[1]} étoiles, drop:{ligne[2]}, effets:{ligne[4]}"
