@@ -78,7 +78,7 @@ async def on_message(message):
 
 
         
-        if datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("@everyone")==0 and global_functions.bon_role(message.author):
+        if datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("@everyone")>=0 and global_functions.bon_role(message.author):
             #si y a le @everyone dans le message et bon_role
             args={"nb_gemmes":2,"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
             with open(Datas.question_file,'w') as f:
