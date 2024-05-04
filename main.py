@@ -71,7 +71,7 @@ async def on_message(message):
             #si y a le !question dans le message et bon_role
             try:
                 args=message.content.split(" ")
-                args[1]=int(args[0])
+                args[1]=int(args[1])
                 args={"nb_gemmes":args[1],"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
                 with open(Datas.question_file,'w') as f:
                     f.write(json.dumps(args))
