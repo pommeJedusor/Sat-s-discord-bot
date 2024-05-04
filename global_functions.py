@@ -99,7 +99,7 @@ class Player:
         if self.caracter[2]>=nb>0:
             self.caracter[2]-=nb
             self.caracter[3]+=nb
-            self.update_stats_player_fichier
+            self.update_stats_player_fichier()
             return True
         else:
             return False
