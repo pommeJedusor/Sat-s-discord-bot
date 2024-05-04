@@ -18,7 +18,7 @@ class ItemsOwned(commands.Cog):
             player.is_player()
             item=global_functions.Items(name)
             if item.is_item() and nombre>0:
-                player.add_item([{"id":item.caracter[6],"nb":nombre}])
+                player.add_item([{"id":item.id,"nb":nombre}])
                 await interaction.edit_original_response(content=f":gift: **L'objet __{name}__ (x{nombre}) a bien été ajouté à {user.name}** :gift:")
             elif not item.is_item():
                 await interaction.edit_original_response(content=f"{name} n'as pas été trouvé")
@@ -35,14 +35,14 @@ class ItemsOwned(commands.Cog):
             player.is_player()
             item=global_functions.Items(name)
             if item.is_item():
-                item_filter = lambda items: items["id"]==item.caracter[6]
-                item_player = list(filter(item_filter,player.caracter[4]))
+                item_filter = lambda items: items["id"]==item.id
+                item_player = list(filter(item_filter,player.items))
                 if len(item_player)>1:
-                    print(f"l'item{item} avec l'id {item.caracter[6]} apparait plusieur fois chez {player}")
+                    print(f"l'item{item} avec l'id {item.id} apparait plusieur fois chez {player}")
 
                 if item_player and item_player[0]["nb"]>=nombre>0:
                     item_player = item_player[0]
-                    player.lose_item(item.caracter[6],nombre)
+                    player.lose_item(item.id,nombre)
                     await interaction.edit_original_response(content=f"l'item {name} a bien été retiré {nombre} fois à {user.name}")
                 
                 elif not item_player:
@@ -65,16 +65,16 @@ class ItemsOwned(commands.Cog):
             text=""
             items_tried = []
             for i in range(1,7):
-                for item in player.caracter[4]:
+                for item in player.items:
                     iteme=global_functions.Items("pomme",id=item['id'])
                     iteme.is_item(x=6)
-                    if iteme.caracter[1]==i:
+                    if iteme.stars==i:
                         items_tried.append(item)
             for item in items_tried:
                 iteme=global_functions.Items("pomme",id=item['id'])
                 iteme.is_item(x=6)
-                stars = "".join([":star:" for i in range(iteme.caracter[1])])
-                text+=f"{stars} - **{iteme.caracter[0]} (x{item['nb']}) **\n"
+                stars = "".join([":star:" for i in range(iteme.stars)])
+                text+=f"{stars} - **{iteme.name} (x{item['nb']}) **\n"
             if text:
                 await interaction.edit_original_response(content=text)
             else:
@@ -89,15 +89,15 @@ class ItemsOwned(commands.Cog):
             player=global_functions.Player(user.name,user.id)
             player.is_player()
             text=""
-            for i in player.caracter[4]:
+            for i in player.items:
                 item=global_functions.Items("pomme",id=i['id'])
-                if item.is_item(x=6) and item.caracter[4]:
+                if item.is_item(x=6) and item.effects:
                     effet=""
-                    if i['nb']>=len(item.caracter[4]):
-                        effet=item.caracter[4][-1]
+                    if i['nb']>=len(item.effects):
+                        effet=item.effects[-1]
                     else:
-                        effet=item.caracter[4][i['nb']]
-                    text+=f"l'item {item.caracter[0]} lui octroy l'effet: {effet} \n"
+                        effet=item.effects[i['nb']]
+                    text+=f"l'item {item.name} lui octroy l'effet: {effet} \n"
             if text !="":
                 await interaction.edit_original_response(content=text)
             else:
@@ -112,15 +112,15 @@ class ItemsOwned(commands.Cog):
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         text=""
-        for i in player.caracter[4]:
+        for i in player.items:
             item=global_functions.Items("pomme",id=i['id'])
-            if item.is_item(x=6) and item.caracter[4]:
+            if item.is_item(x=6) and item.effects:
                 effet=""
-                if i['nb']>=len(item.caracter[4]):
-                    effet=item.caracter[4][-1]
+                if i['nb']>=len(item.effects):
+                    effet=item.effects[-1]
                 else:
-                    effet=item.caracter[4][i['nb']-1]
-                text+=f"l'item {item.caracter[0]} vous octroy l'effet: {effet} \n"
+                    effet=item.effects[i['nb']-1]
+                text+=f"l'item {item.name} vous octroy l'effet: {effet} \n"
         if text !="":
             await interaction.edit_original_response(content=text)
         else:
@@ -132,21 +132,21 @@ class ItemsOwned(commands.Cog):
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         text=""
-        if player.caracter[4]:
+        if player.items:
             text+=f"**   {Datas.emogi_cristal} Ton inventaire : {Datas.emogi_cristal}**\n\n"
             text+=f"__**Objets :**__\n"
         items_tried = []
         for i in range(1,7):
-            for item in player.caracter[4]:
+            for item in player.items:
                 iteme=global_functions.Items("pomme",id=item['id'])
                 iteme.is_item(x=6)
-                if iteme.caracter[1]==i:
+                if iteme.stars==i:
                     items_tried.append(item)
         for item in items_tried:
             iteme=global_functions.Items("pomme",id=item['id'])
             iteme.is_item(x=6)
-            stars = "".join([":star:" for i in range(iteme.caracter[1])])
-            text+=f"{stars} - **{iteme.caracter[0]} (x{item['nb']}) **\n"
+            stars = "".join([":star:" for i in range(iteme.stars)])
+            text+=f"{stars} - **{iteme.name} (x{item['nb']}) **\n"
         if not text:
             text="malheureusement vous ne possédez aucun item, n'hésitez pas à faire des tirages pour en avoir "
         await interaction.edit_original_response(content=text)

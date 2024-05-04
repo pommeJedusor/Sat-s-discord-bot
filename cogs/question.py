@@ -36,7 +36,7 @@ class Question(commands.Cog):
             user = self.bot.get_user(id_user)
             player = global_functions.Player(user.name,user.id)
             player.is_player()
-            player.caracter[2]+=dif_gems
+            player.nb_gemmes+=dif_gems
             player.update_stats_player_fichier()
 
         await interaction.edit_original_response(content=f"la récompense est désormais de {gemmes}")

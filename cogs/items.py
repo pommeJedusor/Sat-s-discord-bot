@@ -32,28 +32,28 @@ class Items(commands.Cog):
         await interaction.response.defer()
         item=global_functions.Items(name)
         if item.is_item() and global_functions.bon_role(interaction.user):
-            item.caracter[0]=name
+            item.name=name
             message=f"l'item {name} a bien été modifié, et à comme caractéristique:\n"
             if new_name is not None:
                 new_item=global_functions.Items(new_name)
                 if not new_item.is_item():
-                    item.caracter[0]=new_name
+                    item.name=new_name
                     message=f"l'item {name} ({new_name} maintenant) a bien été modifié, et à comme caractéristique:\n"
             if nombre_d_étoiles is not None:
-                item.caracter[1]=nombre_d_étoiles
+                item.stars=nombre_d_étoiles
                 message+=f"étoiles: {nombre_d_étoiles}\n"
             if indice_drop is not None:
-                item.caracter[2]=indice_drop
+                item.drop=indice_drop
                 message+=f"indice de drop: {indice_drop}\n"
             if image_link is not None:
-                item.caracter[3]=image_link
+                item.url_img=image_link
                 message+=f"lien pour l'image: {image_link}\n"
             if effets is not None:
                 effets=effets.split(",")
-                item.caracter[4]=effets
+                item.effects=effets
                 message+=f"effets: {effets}\n"
             if tirage_active is not None:
-                item.caracter[5]=tirage_active
+                item.on_tirage=tirage_active
                 if tirage_active:
                     message+=f"est dans les tirages: oui\n"
                 else:
@@ -127,9 +127,9 @@ class Items(commands.Cog):
     async def change_channel(self,interaction:discord.Interaction,name_item:str):
         await interaction.response.defer()
         item=global_functions.Items(name_item)
-        if item.is_item() and item.caracter[3]:
-            await interaction.edit_original_response(content=item.caracter[3])
-        elif not item.caracter[3]:
+        if item.is_item() and item.url_img:
+            await interaction.edit_original_response(content=item.url_img)
+        elif not item.url_img:
             await interaction.edit_original_response(content=f"l'item {item} n'as pas d'image ")
         else:
             await interaction.edit_original_response(content=f"l'item {item} n'as pas été trouvé")

@@ -24,19 +24,19 @@ class Dropdown(discord.ui.Select):
         player.is_player()
         item = global_functions.Items(name="pomme",id=self.values[0])
         item.is_item(x=6)
-        channel_perso=self.bot.get_channel(player.caracter[5])
+        channel_perso=self.bot.get_channel(player.salon)
 
-        player.lose_item(item.caracter[6],1)
+        player.lose_item(item.id,1)
         text=""
         for i in player.tirages(1,tirage_4=True):
-            text+=f"{i.caracter[0]}: {i.caracter[1]} étoiles \n"
-        player.caracter[8].append({"id": Datas.arsmote_id, "active": False})
-        player.caracter[8].remove({"id": Datas.arsmote_id, "active": True})
+            text+=f"{i.name}: {i.stars} étoiles \n"
+        player.powers.append({"id": Datas.arsmote_id, "active": False})
+        player.powers.remove({"id": Datas.arsmote_id, "active": True})
         await interaction.response.send_message(text)
-        await interaction.channel.send(i.caracter[3])
-        if not interaction.channel_id == player.caracter[5]:
+        await interaction.channel.send(i.url_img)
+        if not interaction.channel_id == player.salon:
             await channel_perso.send(text)
-            await channel_perso.send(i.caracter[3])
+            await channel_perso.send(i.url_img)
         player.update_stats_player_fichier()
 
 
@@ -60,22 +60,22 @@ class Arsmote(commands.Cog):
         player=global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         items = []
-        if {"id":Datas.arsmote_id,"active":True} in player.caracter[8]:
-            for item in player.caracter[9]:
+        if {"id":Datas.arsmote_id,"active":True} in player.powers:
+            for item in player.historique:
                 if not item in items:
                     items.append(item)
             true_items = []
             for item in items:
                 item = global_functions.Items("nimp",id=item)
                 item.is_item(x=6)
-                if item.caracter[1] == 4:
-                    true_items.append({"name":item.caracter[0],"id":item.caracter[6]})
+                if item.stars == 4:
+                    true_items.append({"name":item.name,"id":item.id})
             if true_items:
                 view = DropdownView(self.bot,true_items)
                 await interaction.edit_original_response(content="arsmote",view=view)
             else:
                 await interaction.edit_original_response(content=f"vous n'avez pas eu de 4 étoiles lors de votre dernier tirage")
-        elif {"id":Datas.arsmote_id,"active":False} in player.caracter[8]:
+        elif {"id":Datas.arsmote_id,"active":False} in player.powers:
             await interaction.edit_original_response(content=f"vous n'avez pas le pouvoir d'actif")
         else:
             await interaction.edit_original_response(content=f":x: **Vous n'avez pas l'objet requis pour effectuer cette commande.** :x:")
