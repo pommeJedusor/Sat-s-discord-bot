@@ -10,7 +10,7 @@ class SuggestModal(discord.ui.Modal, title="suggestion"):
     global channel_bot
     suggestion = discord.ui.TextInput(label="pomme",style=discord.TextStyle.paragraph)
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f"suggestion envoyé")
+        await interaction.response.send_message(f"suggestion envoyé",ephemeral=True)
         await channel_bot.send(f"{self.suggestion}")
 
 class Buttons(discord.ui.View):
@@ -31,7 +31,7 @@ class Help(commands.Cog):
     async def help(self, interaction:discord.Interaction):
         view=Buttons()
         view.add_item(discord.ui.Button(label="voir les commandes",style=discord.ButtonStyle.link, url="https://github.com/pommeJedusor/Sat-s-discord-bot/blob/main/README.md"))
-        await interaction.response.send_message(view=view)
+        await interaction.response.send_message(view=view,ephemeral=True)
 
 async def setup(bot):
     global channel_bot
