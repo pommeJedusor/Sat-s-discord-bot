@@ -24,7 +24,7 @@ class Tirage(commands.Cog):
             await interaction.response.send_message(f"vous avez obtenus...")
 
             #yato
-            if player.caracter[10]>0:
+            """if player.caracter[10]>0:
                 if nombre_de_tirage>player.caracter[10]:
                     nombre_de_tentative_gemmes=player.caracter[10]
                 else:
@@ -43,21 +43,25 @@ class Tirage(commands.Cog):
                     if not interaction.channel==channel_perso:
                         await interaction.channel.send("vous avez gagné 2 gemmes")
                     await asyncio.sleep(2)
+            player.update_stats_player_fichier()"""
 
             
-            player.update_stats_player_fichier()
             for i in player.tirages(nombre_de_tirage):
-                i.is_item()
-                await asyncio.sleep(i.caracter[1])
-                if player.caracter[5]!=1040228357981343764:
-                    await channel_perso.send(f"{i.caracter[0]} : {i.caracter[1]} étoiles :")
-                if not interaction.channel==channel_perso:
-                    await interaction.channel.send(f"{i.caracter[0]} : {i.caracter[1]} étoiles :")
-                if i.caracter[3]:
+                if not type(i)==str:  
+                    i.is_item()
+                    await asyncio.sleep(i.caracter[1])
                     if player.caracter[5]!=1040228357981343764:
-                        await channel_perso.send(f"{i.caracter[3]}")
+                        await channel_perso.send(f"{i.caracter[0]} : {i.caracter[1]} étoiles :")
                     if not interaction.channel==channel_perso:
-                        await interaction.channel.send(f"{i.caracter[3]}")
+                        await interaction.channel.send(f"{i.caracter[0]} : {i.caracter[1]} étoiles :")
+                    if i.caracter[3]:
+                        if player.caracter[5]!=1040228357981343764:
+                            await channel_perso.send(f"{i.caracter[3]}")
+                        if not interaction.channel==channel_perso:
+                            await interaction.channel.send(f"{i.caracter[3]}")
+                else:
+                    await asyncio.sleep(5)
+                    await interaction.channel.send("vous avez gagné 2 cristaux d'expedition")
             tirage_en_cours = False
         elif not interaction.channel_id==Datas.channel_tirage_gacha:
             await interaction.response.send_message(f"vous êtes dans le mauvais channel aller dans tirage gacha pour effectuer cette commande",ephemeral=True)
