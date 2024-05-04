@@ -66,9 +66,11 @@ def delete_line(self):
     with open(self.file,"w") as f:
         f.write(text)
 
-def bon_role(user):
+def bon_role(user,animateur=False):
     for r in user.roles:
         if r.id in Datas.role_modo:
+            return True
+        if animateur and r.id in Datas.role_animateur:
             return True
 
 def votes(user,message):
