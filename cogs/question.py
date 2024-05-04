@@ -12,7 +12,7 @@ class Question(commands.Cog):
     def __init__(self, bot):
         self.bot = bot 
 
-    @app_commands.command(name="reward_question_semaine", description="choisir le nombre de gemmes de récompense par défaut 2")
+    @app_commands.command(name="recompense_question_semaine", description="choisir le nombre de gemmes de récompense par défaut 2")
     async def reward_question_semaine(self,interaction:discord.Interaction,gemmes:int):
         #check si modo
         if not global_functions.bon_role(interaction.user):
