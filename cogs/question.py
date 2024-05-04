@@ -8,6 +8,8 @@ import json
 
 from datas.datas import Datas
 
+import random
+
 PROPOSITON_QUESTION_FILE = "datas/datas_propositions_questions"
 
 class Question(commands.Cog):
@@ -80,6 +82,23 @@ class Question(commands.Cog):
         else:
             await interaction.edit_original_response(content=f"le message n'as pas été trouvé")
 
+    @app_commands.command(name="voir_les_questions", description="permet de voir les question proposé par les joueurs")
+    async def voir_les_questions(self,interaction:discord.Interaction):
+        data = [
+
+        ]
+
+        for i in range(1,15):
+            data.append({
+                "number": f"{i})",
+                "question": f"une question potentiellement intéressante mais potentiellement pas",
+                "votes": random.randint(1,5)
+            })
+
+        pagination_view = PaginationView(timeout=None)
+        pagination_view.data = data
+        await pagination_view.send(interaction)
+
     #players
     @app_commands.command(name="proposition_question", description="permet de proposer une question pour la question de la semaine")
     async def proposition_question(self,interaction:discord.Interaction):
@@ -95,6 +114,82 @@ class QuestionModal(discord.ui.Modal, title="proposition_question"):
             f.write(json.dumps(proposition_question2)+"\n")
         await interaction.response.send_message(f"proposition_question envoyé",ephemeral=True)
 
+
+class PaginationView(discord.ui.View):
+    current_page : int = 1
+    sep : int = 5
+
+    async def send(self, interaction):
+        self.message = await interaction.response.send_message(view=self)
+        await self.update_message(interaction, self.data[:self.sep])
+
+    def create_embed(self, data):
+        embed = discord.Embed(title=f"liste des questions {self.current_page} / {int(len(self.data) / self.sep) + 1}:")
+        for item in data:
+            embed.add_field(name=item['number'], value=f"{item['question']}\nvotes: {item['votes']}", inline=False)
+        return embed
+
+    async def update_message(self,interaction: discord.Interaction,data):
+        self.update_buttons()
+        await interaction.edit_original_response(embed=self.create_embed(data),view=self)
+
+    def update_buttons(self):
+        if self.current_page == 1:
+            self.first_page_button.disabled = True
+            self.prev_button.disabled = True
+            self.first_page_button.style = discord.ButtonStyle.gray
+            self.prev_button.style = discord.ButtonStyle.gray
+        else:
+            self.first_page_button.disabled = False
+            self.prev_button.disabled = False
+            self.first_page_button.style = discord.ButtonStyle.green
+            self.prev_button.style = discord.ButtonStyle.primary
+
+        if self.current_page == int(len(self.data) / self.sep) + 1:
+            self.next_button.disabled = True
+            self.last_page_button.disabled = True
+            self.last_page_button.style = discord.ButtonStyle.gray
+            self.next_button.style = discord.ButtonStyle.gray
+        else:
+            self.next_button.disabled = False
+            self.last_page_button.disabled = False
+            self.last_page_button.style = discord.ButtonStyle.green
+            self.next_button.style = discord.ButtonStyle.primary
+
+    def get_current_page_data(self):
+        until_item = self.current_page * self.sep
+        from_item = until_item - self.sep
+        return self.data[from_item:until_item]
+
+
+    @discord.ui.button(label="|<",
+                       style=discord.ButtonStyle.green)
+    async def first_page_button(self, interaction:discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        self.current_page = 1
+
+        await self.update_message(interaction, self.get_current_page_data())
+
+    @discord.ui.button(label="<",
+                       style=discord.ButtonStyle.primary)
+    async def prev_button(self, interaction:discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        self.current_page -= 1
+        await self.update_message(interaction, self.get_current_page_data())
+
+    @discord.ui.button(label=">",
+                       style=discord.ButtonStyle.primary)
+    async def next_button(self, interaction:discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        self.current_page += 1
+        await self.update_message(interaction, self.get_current_page_data())
+
+    @discord.ui.button(label=">|",
+                       style=discord.ButtonStyle.green)
+    async def last_page_button(self, interaction:discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        self.current_page = int(len(self.data) / self.sep) + 1
+        await self.update_message(interaction, self.get_current_page_data())
 
 async def setup(bot):
     await bot.add_cog(Question(bot))
