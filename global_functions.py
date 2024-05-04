@@ -192,9 +192,6 @@ class Player:
             if result:
                 new_item=Items(result['name'])
                 new_item.is_item()
-                if new_item.caracter[6] == Datas.panda_id or Datas.arsmote_id:
-                    if not {"id":new_item.caracter[6],"active":True} in self.caracter[8] and not {"id":new_item.caracter[6],"active":False} in self.caracter[8]:
-                        self.caracter[8].append({"id":new_item.caracter[6],"active":True})
                 self.add_item([{"id":new_item.caracter[6],"nb":1}])
                 all_items.append(new_item)
         self.caracter[9]=[]
