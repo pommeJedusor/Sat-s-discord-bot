@@ -1,8 +1,7 @@
 
-| au lancement |
-|--------------|
-|check si nouveaux messages dans question et agit en conséquence|
-|vérifie si il y a de nouveaux votes(hosts)|
+au lancement  
+- check si nouveaux messages dans question et agit en conséquence  
+- vérifie si il y a de nouveaux votes(hosts)  
 
 au moment du tirage si pity non complète le bot additionne les indices de drop et tire au sort un nombre au hasard et renvoy l'objet correspondant exemple: pomme: 1 , poire: 2 , patate: 5 le bot fait la somme 1+2+5=8 tire au sort un nombre entier entre 1 et 8 compris puis si 1 donne pomme, si 2 ou 3 donne poire et de 4 à 8 donne patate (si la somme total est de cent cela équivaut à un pourcentage et si de milles ou dix milles cela l'inclut avec les virgules. exemple: pomme: 40, poire: 10 patate: 50. la pomme auras 40% de chance d'être tirés)
 
@@ -40,7 +39,7 @@ pour la question de la semaine, vous pouvez mettre au début la commande "!quest
 |arsmote|permet de relancer le tirage d'un item 4 étoiles obtenu lors du dernier tirage(peut réobtenir le même si pas de chance)|
 |yato|nécéssite Yato, pour les 10 prochains tirages 20% de chance de gagner 2 gemmes à la place|
 
-## pour les tirages
+## pour les questions de la semaine
 
 #### 1ère méthode (plus pratique)
 utiliser la commande "/question",  
