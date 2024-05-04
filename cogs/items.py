@@ -73,7 +73,7 @@ class Items(commands.Cog):
         active_filter = lambda ligne: active==None or ligne[5]==active
         drop_filter = lambda ligne: drop==None or ligne[2]==drop
 
-        items=""
+        items=[]
         lignes=[]
         with open(Datas.items_file,'r')as f:
             for ligne in f:
@@ -95,12 +95,14 @@ class Items(commands.Cog):
         lignes = items_tried
 
         for ligne in lignes:
-            items+=f"nom: {ligne[0]}, {ligne[1]} étoiles, drop:{ligne[2]}, effets:{ligne[4]}"
             if ligne[5]:
-                items+=", est présent dans les tirages \n"
+                items.append(f"nom: {ligne[0]}, {ligne[1]} étoiles, drop:{ligne[2]}, effets:{ligne[4]}, est présent dans les tirages \n")
             else:
-                items+=", est absent des tirages \n"
-        await interaction.response.send_message(items)
+                items.append(f"nom: {ligne[0]}, {ligne[1]} étoiles, drop:{ligne[2]}, effets:{ligne[4]}, est absent des tirages \n")
+
+        await interaction.response.send_message("".join(items[:10]))
+        for i in range(1,(len(items)-1)//10+1):
+            await interaction.channel.send("".join(items[10*i:10*i+10]))
 
     @app_commands.command(name="delete_item",description="permet de supprimer un item")
     async def delete_item(self,interaction:discord.Interaction,name:str):
