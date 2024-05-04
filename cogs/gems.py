@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 import global_functions
 from datas.datas import Datas
+import json
 
 class Gems(commands.Cog):
     def __init__(self,bot):
@@ -55,6 +56,41 @@ class Gems(commands.Cog):
         player = global_functions.Player(interaction.user.name,interaction.user.id)
         player.is_player()
         await interaction.response.send_message(f"{Datas.emogi_cristal} Vous possédez **{player.caracter[2]} Cristaux d'Expédition** ! {Datas.emogi_cristal}\n{Datas.emogi_cristal} Vous avez dépensez au total **{player.caracter[3]} Cristaux d'Expédition** ! {Datas.emogi_cristal}",ephemeral=True)
+    
+
+    @app_commands.choices(tri=[
+    app_commands.Choice(name="gems", value="gems"),
+    app_commands.Choice(name="name", value="name"),
+    ])
+    @app_commands.command(name="see_all_gems",description="permet de voir les gemmes possédés et dépensé de tout les joueurs")
+    async def see_all_gems(self,interaction : discord.Interaction, tri :app_commands.Choice[str]=None):
+        await interaction.response.send_message("voici la liste des joueurs et leurs nombres de gemmes")
+        texts=[]
+        with open (Datas.player_file,"r") as f:
+            for line in f:
+                line = json.loads(line)
+                texts.append([line[0],line[2],f"{line[0]}: {line[2]} possédées {line[3]} dépensé"])
+
+        tri_lambda_gems = lambda x: x[1]
+        tri_lambda_name = lambda x: x[0].lower()
+        texts.sort(key=tri_lambda_name)
+        if not tri==None and tri.value=="gems":
+            texts.sort(key=tri_lambda_gems)
+            
+        print(texts)
+
+        for i in range(len(texts)//10+1):
+            text = ""
+            first=True
+            for line in texts[i*10:(i+1)*10]:
+                if first:
+                    text+=line[2]
+                    first=False
+                else:
+                    text+="\n"+line[2]
+            await interaction.channel.send(text)
+
+                
 
 
 async def setup(bot):
