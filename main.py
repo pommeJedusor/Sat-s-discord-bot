@@ -1,7 +1,7 @@
 import random, time, discord, json, asyncio
 from discord.ext import commands
 from discord import app_commands
-from datas import Datas
+from datas.datas import Datas
 from typing import Optional
 
 def tirage(file,stars=None):
