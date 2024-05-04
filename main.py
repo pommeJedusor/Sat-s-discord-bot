@@ -17,6 +17,7 @@ async def on_ready():
         await bot.load_extension("cogs.powers")
         await bot.load_extension("cogs.tirage")
         await bot.load_extension("cogs.arsmote")
+        await bot.load_extension("cogs.question")
         synced = await bot.tree.sync()
         print(f"synced {len(synced) }command(s)")
     except Exception as e:
@@ -53,33 +54,38 @@ async def on_raw_reaction_add(payload):
 
 @bot.event
 async def on_message(message):
-    with open(Datas.question_file,"r") as f:
-        ligne = f.readline()
-        if ligne:
-            line=json.loads(ligne)
-        else:
-            line = {"id_users":["patate","poire",message.author.id]}
-    if message.content.find("!question")==0 and global_functions.bon_role(message.author) and message.channel.id==Datas.channel_question:
-        #si y a le !question dans le message et bon_role
-        try:
-            args=message.content.split(" ")
-            args=args[1].split("_")
-            args[0]=int(args[0])
-            args[1]=int(args[1])*3600+int(str(datetime.datetime.timestamp(message.created_at)).split(".")[0])
-            args={"nb_gemmes":args[0],"endtime":args[1],"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
+    if message.channel.id == Datas.channel_question and not message.author.bot:
+        with open(Datas.question_file,"r") as f:
+            ligne = f.readline()
+            if ligne:
+                line=json.loads(ligne)
+            else:
+                line = {"nb_gemmes": 0, "id_users": [], "starttime": 0, "message_id": 0}
+        
+        if datetime.datetime.timestamp(message.created_at)>line["starttime"] and line["id_users"]==False and line["message_id"]==message.author.id:
+            args={"nb_gemmes":line["nb_gemmes"],"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
             with open(Datas.question_file,'w') as f:
                 f.write(json.dumps(args))
-        except:
-            bot_channel = bot.get_channel(Datas.channel_message_bot)
-            await bot_channel.send(f"<@{message.author.id}> erreur: le message doit absolument commencer par 'question A_B', A étant le nombre de gemmes et B le nombre d'heure, veuillez supprimer et renvoyer le message pour que cela puisse fonctionné")
-    elif message.content.find("!question")==-1 and not message.author.id in line['id_users'] and int(str(datetime.datetime.timestamp(message.created_at)).split(".")[0])<line['endtime']: 
-        player=global_functions.Player(message.author.name,message.author.id)
-        player.is_player()
-        player.caracter[2]+=line['nb_gemmes']
-        line['id_users'].append(message.author.id)
-        with open(Datas.question_file,"w") as f:
-            f.write(json.dumps(line))
-        player.update_stats_player_fichier()
+        
+        elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("!question")==0 and global_functions.bon_role(message.author) and message.channel.id==Datas.channel_question:
+            #si y a le !question dans le message et bon_role
+            try:
+                args=message.content.split(" ")
+                args[1]=int(args[0])
+                args={"nb_gemmes":args[1],"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
+                with open(Datas.question_file,'w') as f:
+                    f.write(json.dumps(args))
+            except:
+                bot_channel = bot.get_channel(Datas.channel_message_bot)
+                await bot_channel.send(f"<@{message.author.id}> erreur: le message doit absolument commencer par 'question A', A étant le nombre de gemmes veuillez supprimer et renvoyer le message pour que cela puisse fonctionné")
+        elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("!question")==-1 and not line["id_users"]==False and not message.author.id in line['id_users']: 
+            player=global_functions.Player(message.author.name,message.author.id)
+            player.is_player()
+            player.caracter[2]+=line['nb_gemmes']
+            line['id_users'].append(message.author.id)
+            with open(Datas.question_file,"w") as f:
+                f.write(json.dumps(line))
+            player.update_stats_player_fichier()
 
 
 
