@@ -19,6 +19,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
+    bot_channel = bot.get_channel(Datas.channel_message_bot)
     #check si y a des réponse à la question de la semaine et donne les gemmes correspondante si c'est le cas
     with open(Datas.question_file,"r") as f:
         line = json.loads(f.readline().replace("\n",""))
@@ -33,7 +34,8 @@ async def on_ready():
         poire=pomme
     for reaction in poire.reactions:
         async for user in reaction.users():
-            global_functions.votes(user,poire)
+            if global_functions.votes(user,poire):
+                await bot_channel.send(f"{user.name} a voté pour le host et gagné 1 gemme ")
     print("prêt")
 
 @bot.tree.command(name="reload_cogs")

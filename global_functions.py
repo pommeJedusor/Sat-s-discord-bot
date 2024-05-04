@@ -73,6 +73,8 @@ def votes(user,message):
         player.caracter[7].append(message.id)
         player.caracter[2]+=1
         player.update_stats_player_fichier()
+        return True
+    return False
 
 class Player:
     def __init__(self,name,id,nb_gemmes=0 ,gemmes_spend=0,items=[],salon=1040228357981343764,pity=[0,0,10,50],votes=[],powers=[],historique=[],yato_tirages=0):
