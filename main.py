@@ -32,6 +32,25 @@ async def on_ready():
     async for message in channel_question.history(after=last_question,oldest_first=True):
         await on_message(message)
 
+    #check si y a des reviews d'events
+    channel_review=bot.get_channel(Datas.channel_review_events)
+    is_find = True
+    try:
+        with open(Datas.review_events_file, "r") as f:
+            line = f.readline()
+            line=json.loads(line)
+    except Exception as error:
+        print("no review events init")
+        with open(Datas.review_events_file, "w") as f:
+           is_find=False 
+    if is_find:
+        async for message in channel_review.history(oldest_first=False):
+            if message.id == line["message_id"]:
+                last_review=message
+                break
+        async for message in channel_review.history(after=last_review,oldest_first=True):
+            await on_message(message)
+
     #check si y a des nouveaux votes
     vote_channel = bot.get_channel(Datas.hosts_id)
     async for message in vote_channel.history(limit=1):
@@ -95,7 +114,34 @@ async def on_message(message):
             bot_channel = bot.get_channel(Datas.channel_message_bot)
             await bot_channel.send(f"{message.author.name} a répondu à la question de la semaine et a gagné {line['nb_gemmes']} cristaux")
 
+    #review events
+    if message.channel.id == Datas.channel_review_events and not message.author.bot:
+        with open(Datas.review_events_file,"r") as f:
+            ligne = f.readline()
+            if ligne:
+                line=json.loads(ligne)
+            else:
+                line = {"nb_gemmes": 0, "id_users": [], "starttime": 0, "message_id": 0}
 
+        if datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("<@&1168659568138657923>")>=0 and global_functions.bon_role(message.author):
+            #si y a le @Prochain Host dans le message et bon_role
+            args={"nb_gemmes":2,"id_users":[],"starttime":datetime.datetime.timestamp(message.created_at),"message_id":message.id}
+            with open(Datas.review_events_file,'w') as f:
+                f.write(json.dumps(args))
+            parameter_channel = bot.get_channel(Datas.channel_message_bot)
+            await parameter_channel.send(f"les reviews events ont été lancé avec succès")
+
+        elif datetime.datetime.timestamp(message.created_at)>line["starttime"] and message.content.find("<@&1168659568138657923>")==-1 and not line["id_users"]==False and not message.author.id in line['id_users'] and line['nb_gemmes']: 
+            #si un joueur fournit une review de l'event
+            player=global_functions.Player(message.author.name,message.author.id)
+            player.is_player()
+            player.nb_gemmes+=line['nb_gemmes']
+            line['id_users'].append(message.author.id)
+            with open(Datas.review_events_file,"w") as f:
+                f.write(json.dumps(line))
+            player.update_stats_player_fichier()
+            bot_channel = bot.get_channel(Datas.channel_message_bot)
+            await bot_channel.send(f"{message.author.name} a fournit une reveiw de l'event et a gagné {line['nb_gemmes']} cristaux")
 
 
 bot.run(Datas.bot_token)
