@@ -62,7 +62,7 @@ class ItemsOwned(commands.Cog):
             text+=f"**   {Datas.emogi_cristal} Ton inventaire : {Datas.emogi_cristal}**\n\n"
             text+=f"__**Objets :**__\n"
         items_tried = []
-        for i in range(1,6):
+        for i in range(1,7):
             for item in player.caracter[4]:
                 iteme=global_functions.Items("pomme",id=item['id'])
                 iteme.is_item(x=6)
@@ -84,7 +84,7 @@ class ItemsOwned(commands.Cog):
             player.is_player()
             text=""
             items_tried = []
-            for i in range(1,6):
+            for i in range(1,7):
                 for item in player.caracter[4]:
                     iteme=global_functions.Items("pomme",id=item['id'])
                     iteme.is_item(x=6)
