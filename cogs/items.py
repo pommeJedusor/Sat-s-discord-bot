@@ -83,7 +83,7 @@ class Items(commands.Cog):
         lignes = list(filter(active_filter,lignes))
         lignes = list(filter(stars_filter,lignes))
         lignes = list(filter(drop_filter,lignes))
-
+        items_tried = lignes
         if tri and tri.value=="stars":
             items_tried = []
             for i in range(1,6):
@@ -92,6 +92,9 @@ class Items(commands.Cog):
                         items_tried.append(ligne)
             for item in items_tried:
                 print(item)
+        elif tri and tri.value=="name":
+            items_tried = sorted(lignes)
+        lignes = items_tried
 
         for ligne in lignes:
             items+=f"nom: {ligne[0]}, {ligne[1]} étoiles, drop:{ligne[2]}, effets:{ligne[4]}"
