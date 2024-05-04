@@ -8,10 +8,13 @@ import json
 
 from datas.datas import Datas
 
+PROPOSITON_QUESTION_FILE = "datas/datas_propositions_questions"
+
 class Question(commands.Cog):
     def __init__(self, bot):
         self.bot = bot 
 
+    #modos
     @app_commands.command(name="recompense_question_semaine", description="choisir le nombre de gemmes de récompense par défaut 2")
     async def reward_question_semaine(self,interaction:discord.Interaction,gemmes:int):
         await interaction.response.defer()
@@ -77,8 +80,20 @@ class Question(commands.Cog):
         else:
             await interaction.edit_original_response(content=f"le message n'as pas été trouvé")
 
-
+    #players
+    @app_commands.command(name="proposition_question", description="permet de proposer une question pour la question de la semaine")
+    async def proposition_question(self,interaction:discord.Interaction):
+        await interaction.response.send_modal(QuestionModal())
             
+class QuestionModal(discord.ui.Modal, title="proposition_question"):
+    proposition_question = discord.ui.TextInput(label="proposition_question",style=discord.TextStyle.paragraph)
+    async def on_submit(self, interaction: discord.Interaction):
+        proposition_question2 = [interaction.user.id,self.proposition_question.value,0]
+        for p in proposition_question2:
+            print(p)
+        with open(PROPOSITON_QUESTION_FILE,"a") as f:
+            f.write(json.dumps(proposition_question2)+"\n")
+        await interaction.response.send_message(f"proposition_question envoyé",ephemeral=True)
 
 
 async def setup(bot):
